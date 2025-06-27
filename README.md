@@ -8,3 +8,5 @@ A mood tracking application with tree simulation for students' mental health enh
 Update:
 This only shows the main homepage and the auth pages with no localStorage functionality whatsoever, because there are some improvements that needs
 to be addressed for the user and admin dashboard, so, best to just explore the homepage.
+
+So sorry for the long inconvenience :(
