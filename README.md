@@ -1,4 +1,8 @@
 # Group_6G_TW01_IT0043L_MoodTree
+
+MoodTree
+
+Description:
 A mood tracking application with tree simulation for students' mental health enhancement and efficiency.
 
 Update:
