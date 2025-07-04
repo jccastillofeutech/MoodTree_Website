@@ -10,39 +10,38 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Get username from URL or localStorage
+ 
     const urlParams = new URLSearchParams(window.location.search);
     let username = urlParams.get('username');
 
     if (username) {
-        // Store username in localStorage if it came from the URL (e.g., after login/signup)
+        
         localStorage.setItem('loggedInUser', username);
     } else {
-        // Try to get username from localStorage if not in URL (e.g., direct access to a dashboard page)
+        
         username = localStorage.getItem('loggedInUser');
     }
 
-    // Display username in sidebar
+   
     const usernameDisplay = document.getElementById('username-display');
     if (usernameDisplay && username) {
         usernameDisplay.textContent = username;
     } else if (usernameDisplay) {
-        usernameDisplay.textContent = 'Guest'; // Default if no user is logged in
+        usernameDisplay.textContent = 'Guest'; 
     }
 
-    // Setup logout button
+
     const logoutButton = document.getElementById('logout-button');
     if (logoutButton) {
         logoutButton.addEventListener('click', (event) => {
             event.preventDefault();
-            localStorage.removeItem('loggedInUser'); // Clear logged-in user
-            localStorage.removeItem('dailyMood'); // Clear daily mood data
-            localStorage.removeItem('tempMood'); // Clear temporary mood data
-            localStorage.removeItem('treeState'); // Clear tree simulator state
-            localStorage.removeItem('treeClicks'); // Clear tree clicks
-            // Optionally clear mood history if desired, but typically calendar history persists
-            // localStorage.removeItem('moodHistory'); 
-            window.location.href = '../auth-pages/login.html'; // Redirect to login page
+            localStorage.removeItem('loggedInUser'); 
+            localStorage.removeItem('dailyMood'); 
+            localStorage.removeItem('tempMood'); 
+            localStorage.removeItem('treeState'); 
+            localStorage.removeItem('treeClicks'); 
+            
+            window.location.href = '../auth-pages/login.html'; 
         });
     }
 
@@ -255,7 +254,7 @@ function setupLogMoodPage() {
         const dailyMood = JSON.parse(localStorage.getItem('dailyMood'));
         let dataToLoad = null;
 
-        // Clear dailyMood and tempMood if they are from a previous day
+     
         if (dailyMood && dailyMood.date !== todayKey) {
             localStorage.removeItem('dailyMood');
         }
@@ -264,32 +263,32 @@ function setupLogMoodPage() {
             localStorage.removeItem('tempMood');
         }
 
-        // Re-fetch potentially cleared data (important after removal)
+       
         const currentDailyMood = JSON.parse(localStorage.getItem('dailyMood'));
         const currentTempMood = JSON.parse(localStorage.getItem('tempMood'));
 
-        // Determine which data to load and whether to disable inputs
+    
         if (currentDailyMood && currentDailyMood.date === todayKey) {
-            // Seed created for today, inputs should be disabled
+           
             dataToLoad = currentDailyMood;
             Object.values(sliders).forEach(s => s.disabled = true);
             createSeedButton.disabled = true;
             saveButton.disabled = true;
             notesArea.disabled = true;
         } else if (currentTempMood && currentTempMood.date === todayKey) {
-            // Mood temporarily saved for today, inputs should be editable
+           
             dataToLoad = currentTempMood;
             Object.values(sliders).forEach(s => s.disabled = false);
             createSeedButton.disabled = false;
             saveButton.disabled = false;
             notesArea.disabled = false;
         } else {
-            // No data for today, ensure inputs are enabled and reset to default values
+       
             Object.values(sliders).forEach(s => s.disabled = false);
             createSeedButton.disabled = false;
             saveButton.disabled = false;
             notesArea.disabled = false;
-            // Reset slider values and notes area to defaults
+          
             Object.keys(sliders).forEach(key => {
                 const defaultVal = key === 'work' || key === 'sleep' ? 8 : 5;
                 sliders[key].value = defaultVal;
@@ -297,7 +296,7 @@ function setupLogMoodPage() {
             notesArea.value = '';
         }
         
-        // Apply loaded data or current default slider values
+        
         if (dataToLoad) {
              Object.keys(sliders).forEach(key => {
                 if(dataToLoad[key]) {
@@ -326,8 +325,8 @@ function loadDashboardData() {
         if (tempMood && tempToad.date === todayKey) {
             dataToDisplay = tempMood;
         } else {
-            // No current day's data, so explicitly reset display
-            dataToDisplay = null; // Mark as no valid data for display
+            
+            dataToDisplay = null; 
         }
     }
 
@@ -353,7 +352,7 @@ function loadDashboardData() {
         document.getElementById('anger-level').style.height = `${(parseInt(dataToDisplay.anger) -1) * 11.1}%`;
         document.getElementById('calmness-level').style.height = `${(parseInt(dataToDisplay.calmness) -1) * 11.1}%`;
     } else {
-        // Explicitly reset dashboard UI elements if no data for today
+       
         const workBar = document.getElementById('work-bar');
         const sleepBar = document.getElementById('sleep-bar');
         workBar.style.height = '0%';
@@ -401,8 +400,7 @@ function setupSimulatorPage() {
     const dailyMood = JSON.parse(localStorage.getItem('dailyMood'));
     const todayKey = new Date().toISOString().split('T')[0];
 
-    // Determine if simulator should be active or show "Create a Seed First!"
-    // It's active ONLY if dailyMood exists, is 'created', is for today, AND treeState is NOT 'shoveled'
+    
     const isSimulatorActive = dailyMood && dailyMood.status === 'created' && dailyMood.date === todayKey && state !== 'shoveled';
 
     if (!isSimulatorActive) {
@@ -414,15 +412,15 @@ function setupSimulatorPage() {
         if(notificationOverlay) notificationOverlay.style.display = 'flex';
         if(redirectBtn) redirectBtn.addEventListener('click', () => { window.location.href = 'log-mood.html'; });
 
-        // If dailyMood is outdated or non-existent, reset simulator UI for a fresh start (for a new day)
+       
         if ((dailyMood && dailyMood.date !== todayKey) || (!dailyMood && state !== 'unplanted')) {
              localStorage.removeItem('treeState');
              localStorage.removeItem('treeClicks');
-             state = 'unplanted'; // Reset current state variable
-             clicks = 0; // Reset clicks variable
+             state = 'unplanted'; 
+             clicks = 0; 
         }
         
-        // If state === 'shoveled' for today, ensure tree is hidden
+
         if (state === 'shoveled') {
             mound.style.display = 'none';
             treeContainer.style.display = 'none';
@@ -432,7 +430,7 @@ function setupSimulatorPage() {
         return; 
     }
     
-    // Simulator is enabled as dailyMood for today exists and is valid
+   
     const moodColor = dailyMood.moodColor;
     const moodName = dailyMood.moodName;
     const treeType = getTreeType(dailyMood.valence, dailyMood.arousal);
@@ -440,19 +438,16 @@ function setupSimulatorPage() {
 
 
     function updateUI() {
-        // Control button states based on 'state' variable, which is updated by user actions
         plantBtn.disabled = state !== 'unplanted';
         waterBtn.disabled = state !== 'planted';
         fertilizeBtn.disabled = state !== 'watered';
         shovelBtn.disabled = state !== 'mature';
 
-        // Control display of mound and tree
+       
         mound.style.display = 'none';
         treeContainer.style.display = 'none';
-        if(notificationOverlay) notificationOverlay.style.display = 'none'; // Hide notification if active
-
+        if(notificationOverlay) notificationOverlay.style.display = 'none';
         if (state === 'unplanted') {
-            // Nothing displayed, waiting for plant
         } else if (state === 'planted') {
             mound.style.display = 'block';
             mound.style.backgroundColor = '#A0522D';
@@ -475,11 +470,11 @@ function setupSimulatorPage() {
             }
         } 
 
-        // Update progress bar
+      
         const progress = Math.min((clicks / clicksNeeded) * 100, 100);
         progressBar.style.width = `${progress}%`;
 
-        // Save tree state and clicks if simulator is active
+
         localStorage.setItem('treeState', state);
         localStorage.setItem('treeClicks', clicks);
     }
@@ -516,10 +511,10 @@ function setupSimulatorPage() {
             history[todayKey] = { moodName, moodColor, treeType };
             localStorage.setItem('moodHistory', JSON.stringify(history));
             
-            // Do NOT remove dailyMood here. It signifies that today's log is done.
-            localStorage.removeItem('tempMood'); // Clear temporary mood if it was set
-            localStorage.removeItem('treeClicks'); // Reset clicks for next session
-            localStorage.setItem('treeState', 'shoveled'); // Mark as shoveled
+          
+            localStorage.removeItem('tempMood'); 
+            localStorage.removeItem('treeClicks'); 
+            localStorage.setItem('treeState', 'shoveled'); 
 
             const showMessage = (msg, callback) => {
                 const overlay = document.createElement('div');
@@ -556,7 +551,7 @@ function drawTree(clicks, treeType) {
     const trunk = tree.querySelector('.trunk');
     const canopy = tree.querySelector('.canopy');
 
-    // Reset all tree-specific classes and inline styles to ensure clean state
+    
     tree.className = ''; 
     trunk.removeAttribute('style'); 
     canopy.removeAttribute('style'); 
