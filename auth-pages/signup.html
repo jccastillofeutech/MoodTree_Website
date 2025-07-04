@@ -117,6 +117,11 @@
             margin-top: 1.5rem;
             text-align: center;
         }
+        .notification.error {
+            background-color: #fed7d7;
+            border-left-color: #f56565;
+            color: #c53030;
+        }
     </style>
 </head>
 <body>
@@ -160,20 +165,34 @@
             // Simple validation
             if (!fullname || !email || !password) {
                 notification.textContent = "Please fill in all fields.";
+                notification.className = 'notification error'; // Add error class
                 notification.style.display = 'block';
                 return;
             }
 
-            // Store user data in localStorage
-            const userData = {
+            // Check if account with this email already exists
+            const storedData = localStorage.getItem('userData');
+            if (storedData) {
+                const userData = JSON.parse(storedData);
+                if (userData.email === email) {
+                    notification.textContent = "An account with this email already exists. Please log in.";
+                    notification.className = 'notification error'; // Add error class
+                    notification.style.display = 'block';
+                    return;
+                }
+            }
+
+            // Store new user data in localStorage
+            const newUserData = {
                 fullname: fullname,
                 email: email,
                 password: password // In a real app, NEVER store passwords in plain text. This is for demonstration only.
             };
-            localStorage.setItem('userData', JSON.stringify(userData));
+            localStorage.setItem('userData', JSON.stringify(newUserData));
+            localStorage.setItem('loggedInUser', fullname); // Set the newly signed-up user as logged in
 
             // Redirect to the dashboard page, passing the username
-            window.location.href = `../user-dashboard/dashboard.html?username=${encodeURIComponent(fullname)}`;
+            window.location.href = `../user-dashboard/user-dashboard.html?username=${encodeURIComponent(fullname)}`;
         });
     </script>
 
