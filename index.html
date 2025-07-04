@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodTree - Track Your Daily Mood</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        :root {
+            --jade-green: #00A86B;
+            --light-green-bg: #F0FFF4;
+            --dark-text: #2D3748;
+            --body-text: #4A5568;
+            --white: #ffffff;
+            --header-font: 'Heavitas', sans-serif;
+            --body-font: 'Creato Display', sans-serif;
+        }
+        body {
+            margin: 0;
+            font-family: var(--body-font);
+            color: var(--body-text);
+            background-color: var(--white);
+            font-size: 16px;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--header-font);
+            color: var(--dark-text);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+        }
+        h1 { font-size: 3rem; }
+        h2 { font-size: 2.5rem; }
+        h3 { font-size: 1.5rem; }
+        p { margin-top: 0; margin-bottom: 1rem; }
+        a { color: inherit; text-decoration: none; }
+        img { max-width: 100%; height: auto; display: block; }
+        .container {
+            max-width: 1100px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+        .small-caps {
+            font-variant: small-caps;
+        }
+        .btn {
+            display: inline-block;
+            font-weight: 700;
+            text-align: center;
+            vertical-align: middle;
+            user-select: none;
+            border: 1px solid transparent;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 9999px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background-color: var(--jade-green);
+            color: var(--white);
+            box-shadow: 0 4px 14px 0 rgba(0, 168, 107, 0.39);
+        }
+        .btn-primary:hover {
+            background-color: #008a58;
+        }
+        .btn-secondary {
+            color: var(--body-text);
+            background-color: var(--white);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06);
+        }
+        .btn-secondary:hover {
+            color: var(--jade-green);
+            border-color: #bee3d8;
+        }
+        header {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: var(--white);
+            transition: box-shadow 0.3s ease-in-out;
+        }
+        header.scrolled {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        .logo img {
+            height: 60px;
+            width: auto;
+        }
+        .nav-and-auth {
+            display: none;
+        }
+        .mobile-menu-button {
+            display: block;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--dark-text);
+        }
+        .mobile-nav {
+            display: none;
+            flex-direction: column;
+            background-color: var(--white);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            position: absolute;
+            top: 100%;
+            left: 1.5rem;
+            right: 1.5rem;
+        }
+        .mobile-nav.active {
+            display: flex;
+        }
+        .mobile-nav a {
+            padding: 0.75rem 1rem;
+            font-weight: bold;
+            text-align: center;
+        }
+        .mobile-nav .btn {
+            width: 100%;
+            margin-top: 0.5rem;
+            box-sizing: border-box;
+        }
+        .section {
+            padding-top: 4rem;
+            padding-bottom: 4rem;
+        }
+        .grid {
+            display: grid;
+            gap: 3rem;
+        }
+        .grid-cols-2 {
+            grid-template-columns: 1fr;
+        }
+        .grid-cols-3 {
+            grid-template-columns: 1fr;
+        }
+        .welcome-section {
+            padding-bottom: 8rem; 
+        }
+        .welcome-section .content {
+            text-align: center;
+        }
+        .welcome-section .illustration {
+             margin: 2rem auto 0;
+             position: relative;
+             z-index: 10;
+        }
+        .special-section {
+            background-color: var(--light-green-bg);
+            position: relative;
+            padding-top: 6rem;
+            padding-bottom: 6rem;
+        }
+        .wavy-divider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            line-height: 0;
+            transform: translateY(-99%);
+            z-index: 5;
+        }
+        .wavy-divider svg {
+            position: relative;
+            display: block;
+            width: calc(100% + 1.3px);
+            height: 80px;
+        }
+        .special-section .container {
+            text-align: center;
+        }
+        .feature-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .feature-icon-wrapper {
+            height: 160px;
+            width: 160px;
+            border-radius: 50%;
+            background-color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        .feature-icon-wrapper img {
+            height: 120px;
+            width: 120px;
+            object-fit: contain;
+        }
+        .about-section {
+            position: relative;
+        }
+        .about-section .grid {
+            align-items: center;
+        }
+        .about-section .content {
+            text-align: center;
+        }
+        .about-section .illustration-left, .about-section .illustration-right {
+            display: none;
+        }
+        footer {
+            background-color: var(--light-green-bg);
+            padding-top: 3rem;
+            padding-bottom: 3rem;
+            position: relative;
+            z-index: 2;
+        }
+        .footer-content {
+            text-align: center;
+        }
+        .footer-logo {
+            display: inline-flex;
+            margin-bottom: 1rem;
+        }
+        .footer-logo img {
+             height: 60px;
+             width: auto;
+        }
+        .social-icons {
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .social-icons a {
+            font-size: 1.75rem;
+            color: var(--jade-green);
+            margin: 0 0.75rem;
+            transition: transform 0.3s;
+        }
+        .social-icons a:hover {
+            transform: scale(1.2);
+        }
+        @media (min-width: 768px) {
+            h1 { font-size: 3.5rem; }
+            .mobile-menu-button, .mobile-nav { display: none; }
+            .nav-and-auth {
+                display: flex;
+                align-items: center;
+                gap: 2rem;
+            }
+            .main-nav {
+                display: flex;
+                align-items: center;
+                gap: 2rem;
+            }
+            .main-nav a {
+                font-weight: bold;
+                transition: color 0.3s;
+            }
+            .main-nav a:hover {
+                color: var(--jade-green);
+            }
+            .auth-buttons {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+            .grid-cols-2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .grid-cols-3 {
+                 grid-template-columns: repeat(3, 1fr);
+            }
+            .welcome-section .content {
+                text-align: left;
+            }
+            .welcome-section .illustration {
+                transform: scale(1.25);
+                transform-origin: bottom center;
+                margin-bottom: -110px;
+            }
+            .about-section {
+                 padding-bottom: 120px;
+            }
+            .about-section .content {
+                 text-align: left;
+                 max-width: 500px;
+                 margin: 0 auto;
+                 position: relative;
+                 z-index: 2;
+            }
+             .about-section .illustration-left, .about-section .illustration-right {
+                display: block;
+                position: absolute;
+                bottom: 0;
+                width: 40%;
+                max-width: 420px;
+                z-index: 1;
+            }
+            .about-section .illustration-left {
+                left: -15px;
+            }
+            .about-section .illustration-right {
+                right: -15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    <img src="images/horizontal-logo.png" alt="MoodTree Logo">
+                </a>
+                <div class="nav-and-auth">
+                    <nav class="main-nav">
+                        <a href="index.html" class="small-caps">HOME</a>
+                        <a href="#about" class="small-caps">ABOUT</a>
+                    </nav>
+                    <div class="auth-buttons">
+                        <a href="auth-pages/login.html" class="btn btn-primary small-caps">LOG IN</a>
+                        <a href="auth-pages/signup.html" class="btn btn-secondary small-caps">SIGN-UP</a>
+                    </div>
+                </div>
+                <button id="mobile-menu-button" class="mobile-menu-button">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        <nav id="mobile-nav" class="mobile-nav">
+            <a href="index.html" class="small-caps">HOME</a>
+            <a href="#about" class="small-caps">ABOUT</a>
+            <a href="auth-pages/login.html" class="btn btn-primary small-caps">LOG IN</a>
+            <a href="auth-pages/signup.html" class="btn btn-secondary small-caps">SIGN-UP</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="section welcome-section">
+            <div class="container">
+                <div class="grid grid-cols-2" style="align-items: center;">
+                    <div class="content">
+                        <h1>WELCOME TO MOODTREE!</h1>
+                        <p style="max-width: 450px;">Where you can track your daily mood, create a seed from it, and grow a virtual tree that signifies what you feel each day.</p>
+                        <a href="auth-pages/signup.html" class="btn btn-primary small-caps" style="padding: 1rem 2rem; margin-top: 1rem;">TRY US!</a>
+                    </div>
+                    <div class="illustration">
+                        <img src="images/welcome-section/person-under-tree.png" alt="Person sitting under a large tree">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="special-section">
+            <div class="wavy-divider">
+                <svg viewBox="0 0 1440 100" fill="#F0FFF4"><path d="M0,50 C240,0 480,100 720,50 C960,0 1200,100 1440,50 L1440,100 L0,100 Z"></path></svg>
+            </div>
+            <div class="container">
+                <h2>WHAT'S SO SPECIAL?</h2>
+                <div class="grid grid-cols-3" style="margin-top: 4rem;">
+                    <div class="feature-card">
+                        <div class="feature-icon-wrapper">
+                            <img src="images/why-section/smile-section.png" alt="Positivity Enhancement Icon">
+                        </div>
+                        <h3>POSITIVITY ENHANCEMENT</h3>
+                        <p>Users get the opportunity to enhance their positive mood using their mood tracking journey.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon-wrapper">
+                            <img src="images/why-section/bulb-section.png" alt="Increased Critical Thinking Icon">
+                        </div>
+                        <h3>INCREASED CRITICAL THINKING</h3>
+                        <p>While mood tracking, it is possible for the users to improve their critical thinking in terms of their mental health.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon-wrapper">
+                            <img src="images/why-section/earth-section.png" alt="Virtual Care Icon">
+                        </div>
+                        <h3>VIRTUAL CARE</h3>
+                        <p>Like real-life planting a tree, users can also feel the warmth of having provided virtual care service through the simulation.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="section about-section">
+            <div class="container">
+                <div class="grid">
+                    <div class="content">
+                        <h2>ABOUT THE WEBSITE</h2>
+                        <p>According to some articles, students nowadays experience more mental health issues that are related to academic performances and validation that is vital with their social and academic life. Like a tree that is constantly withering if not functioning properly throughout its natural roots.</p>
+                        <p>Which is why, MoodTree fights these problems by letting them track their moods and create virtual trees that represent each mood in every single day.</p>
+                    </div>
+                </div>
+            </div>
+             <img src="images/about-section/grouped-tree.png" class="illustration-left" alt="Trees illustration">
+             <img src="images/about-section/single-tree.png" class="illustration-right" alt="Tree illustration">
+        </section>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <a href="index.html" class="logo footer-logo">
+                    <img src="images/horizontal-logo.png" alt="MoodTree Logo">
+                </a>
+                <p>&copy; 2025 MoodTree. All Rights Reserved.</p>
+                <div class="social-icons">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileNav = document.getElementById('mobile-nav');
+        const header = document.querySelector('header');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileNav.classList.toggle('active');
+        });
+        
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                if (mobileNav.classList.contains('active')) {
+                    mobileNav.classList.remove('active');
+                }
+            });
+        });
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 10) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>
