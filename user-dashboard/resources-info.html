@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodTree - Resources</title>
+    <link rel="stylesheet" href="css-styling/user-menu-style.css">
+    <style>
+        .resources-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+        .info-box {
+            background-color: #C3B091;
+            border-radius: 12px;
+            padding: 30px;
+            color: #5D4037;
+            width: 100%;
+            max-width: 1000px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .info-box h2 {
+            font-family: 'Heavitas', sans-serif;
+            margin: 0 0 15px 0;
+            color: #5D4037;
+            font-size: 22px;
+        }
+        
+        .hotlines-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .hotline-card {
+            background-color: #ECE5D8;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #5D4037;
+        }
+
+        .hotline-logo {
+            width: 100px;
+            height: 100px;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            flex-shrink: 0;
+            padding: 10px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+        .hotline-logo img{
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .hotline-card h3 {
+            font-family: 'Heavitas', sans-serif;
+            margin: 0 0 10px 0;
+        }
+        .hotline-card p {
+            margin: 0 0 15px 0;
+            font-size: 15px;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+        .hotline-card .number {
+            font-weight: bold;
+            font-size: 20px;
+        }
+        /* Logout button style */
+        .logout-button {
+            background-color: #d32f2f; /* Red color for logout */
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 20px;
+            font-family: 'Heavitas', sans-serif;
+            transition: background-color 0.2s;
+            text-decoration: none; /* Ensure it looks like a button, not a link */
+            display: block; /* Make it a block element to take full width */
+        }
+
+        .logout-button:hover {
+            background-color: #b71c1c; /* Darker red on hover */
+        }
+    </style>
+</head>
+<body id="resources-page">
+
+    <div class="sidebar">
+        <div class="logo-container">
+            <div class="logo"></div>
+            <p id="username-display">Username</p>
+        </div>
+        <nav class="nav">
+            <a href="user-dashboard.html">DASHBOARD</a>
+            <a href="log-mood.html">LOG MOODS</a>
+            <a href="tree-simulator.html">SIMULATOR</a>
+            <a href="user-calendar.html">CALENDAR</a>
+            <a href="resources-info.html" class="active">RESOURCES</a>
+        </nav>
+        <a href="#" id="logout-button" class="logout-button">LOG OUT</a>
+        <div class="footer">
+            <p>&copy; 2025 MoodTree.<br>All Rights Reserved.</p>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <div class="resources-content">
+            <div class="info-box">
+                <h2>EXPERIENCING WORSE MENTAL HEALTH PROBLEMS? DIAL EMERGENCY!</h2>
+                <p>Our developers provide extra care if such problems weren't met with the application, or if the mental health had worsen over the days. Which is why below are some of the emergency hotlines the user can contact that gives free service to those who are in mental danger.</p>
+            </div>
+
+            <div class="hotlines-grid">
+                <div class="hotline-card">
+                    <div class="hotline-logo">
+                        <img src="images/resources-logo/NCMH.png" alt="NCMH Logo">
+                    </div>
+                    <h3>NCMH CRISIS HOTLINE</h3>
+                    <p>Offers free 24/7 service over the phone, where they treat people with such mental illnesses.</p>
+                    <div class="number">1800-1888-1553</div>
+                </div>
+
+                 <div class="hotline-card">
+                    <div class="hotline-logo">
+                        <img src="images/resources-logo/InTouch.png" alt="In Touch Logo">
+                    </div>
+                    <h3>IN TOUCH CENTER</h3>
+                    <p>Providing mental health services in the Philippines since 1980.</p>
+                    <div class="number">+632-8893-7603</div>
+                </div>
+
+                 <div class="hotline-card">
+                    <div class="hotline-logo">
+                        <img src="images/resources-logo/Hopeline-PH.jpg" alt="Hopeline Logo">
+                    </div>
+                    <h3>HOPELINE</h3>
+                    <p>A 24/7 suicide prevention and crisis support helpline.</p>
+                    <div class="number">0917-558-4673</div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h2>WHY IS IT IMPORTANT TO DIAL THESE IN TERMS OF MENTAL DANGER?</h2>
+                <p>It is because of how they provide quick and free responses in times of these worse situations that can lead up to more problems that would affect the people involved, like the family itself. It is also a backup therapeutic solution that directly provides mental health care for people who are experiencing it that is worse.</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="scripts/user-menu-script.js"></script>
+</body>
+</html>

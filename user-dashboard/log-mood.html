@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodTree - Log Mood</title>
+    <link rel="stylesheet" href="css-styling/user-menu-style.css">
+    <style>
+        .log-mood-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            width: 100%;
+            flex-grow: 1;
+        }
+        .left-panel, .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .notes-container {
+            border: 1px solid #E0E0E0;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .notes-header {
+            background: #81C784;
+            color: white;
+            padding: 15px 20px;
+        }
+        .notes-header h2 {
+            margin: 0;
+            font-family: 'Heavitas', sans-serif;
+            font-size: 20px;
+        }
+        #notes-area {
+            flex-grow: 1;
+            border: none;
+            padding: 15px;
+            font-family: 'Creato Display', sans-serif;
+            font-size: 16px;
+            resize: none;
+            outline: none;
+        }
+        #char-counter {
+            text-align: right;
+            padding: 5px 15px;
+            font-size: 14px;
+            color: #888;
+            background-color: #F5F5F5;
+        }
+        .sliders-container {
+            border: 1px solid #E0E0E0;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .slider-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .icon-container {
+            width: 60px;
+            flex-shrink: 0;
+            text-align: center;
+        }
+        .emotion-icon {
+            width: 60px;
+            height: 60px;
+        }
+        .slider-item label {
+            width: 80px;
+            flex-shrink: 0;
+        }
+        .slider-wrapper {
+            flex-grow: 1;
+            position: relative;
+        }
+        .lever {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 25px;
+            border-radius: 15px;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity .2s;
+            margin: 0;
+        }
+        .lever:hover {
+            opacity: 1;
+        }
+        .lever::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #fff;
+            border: 3px solid;
+            cursor: pointer;
+        }
+         .lever::-moz-range-thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #fff;
+            border: 3px solid;
+            cursor: pointer;
+        }
+        #happiness-slider { background: linear-gradient(90deg, #E8F5E9, #4CAF50); }
+        #sadness-slider { background: linear-gradient(90deg, #FFFDE7, #FFC107); }
+        #anger-slider { background: linear-gradient(90deg, #FFEBEE, #F44336); }
+        #calmness-slider { background: linear-gradient(90deg, #E3F2FD, #2196F3); }
+        #work-slider, #sleep-slider { background: #E0E0E0; }
+        #happiness-slider::-webkit-slider-thumb { border-color: #4CAF50; }
+        #sadness-slider::-webkit-slider-thumb { border-color: #FFC107; }
+        #anger-slider::-webkit-slider-thumb { border-color: #F44336; }
+        #calmness-slider::-webkit-slider-thumb { border-color: #2196F3; }
+        #work-slider::-webkit-slider-thumb, #sleep-slider::-webkit-slider-thumb { border-color: #8D8D8D; }
+        #happiness-slider::-moz-range-thumb { border-color: #4CAF50; }
+        #sadness-slider::-moz-range-thumb { border-color: #FFC107; }
+        #anger-slider::-moz-range-thumb { border-color: #F44336; }
+        #calmness-slider::-moz-range-thumb { border-color: #2196F3; }
+        #work-slider::-moz-range-thumb, #sleep-slider::-moz-range-thumb { border-color: #8D8D8D; }
+        .progress-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            position: relative;
+            background: #E0E0E0;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+         .progress-circle::before{
+             content: '';
+             position: absolute;
+             width: 50px;
+             height: 50px;
+             background-color: #fff;
+             border-radius: 50%;
+        }
+        .progress-circle span {
+            position: relative;
+            font-size: 20px;
+            font-family: 'Heavitas', sans-serif;
+            color: #333;
+        }
+        .result-container {
+             border: 1px solid #E0E0E0;
+             border-radius: 12px;
+             padding: 20px;
+             text-align: center;
+        }
+        .mood-color-box {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 15px auto;
+            background-color: #DDD;
+            transition: background-color 0.3s ease;
+        }
+        .mood-name {
+            font-family: 'Heavitas', sans-serif;
+            font-size: 24px;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .action-buttons button {
+            font-family: 'Heavitas', sans-serif;
+            font-size: 18px;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        #save-mood {
+            background-color: #81C784;
+            color: #333;
+        }
+         #create-seed {
+            background-color: #A1887F;
+            color: white;
+        }
+        /* Logout button style */
+        .logout-button {
+            background-color: #d32f2f; /* Red color for logout */
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 20px;
+            font-family: 'Heavitas', sans-serif;
+            transition: background-color 0.2s;
+            text-decoration: none; /* Ensure it looks like a button, not a link */
+            display: block; /* Make it a block element to take full width */
+        }
+
+        .logout-button:hover {
+            background-color: #b71c1c; /* Darker red on hover */
+        }
+    </style>
+</head>
+<body id="log-mood-page">
+
+    <div class="sidebar">
+        <div class="logo-container">
+            <div class="logo"></div>
+            <p id="username-display">Username</p>
+        </div>
+        <nav class="nav">
+            <a href="user-dashboard.html">DASHBOARD</a>
+            <a href="log-mood.html" class="active">LOG MOODS</a>
+            <a href="tree-simulator.html">SIMULATOR</a>
+            <a href="user-calendar.html">CALENDAR</a>
+            <a href="resources-info.html">RESOURCES</a>
+        </nav>
+        <a href="#" id="logout-button" class="logout-button">LOG OUT</a>
+        <div class="footer">
+            <p>&copy; 2025 MoodTree.<br>All Rights Reserved.</p>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>LOG MOOD</h1>
+            <div class="date"></div>
+        </header>
+
+        <div class="log-mood-container">
+            <div class="left-panel">
+                <div class="notes-container">
+                    <div class="notes-header">
+                        <h2>NOTES FOR TODAY</h2>
+                    </div>
+                    <textarea id="notes-area" placeholder="Write an optional note..." maxlength="400"></textarea>
+                    <div id="char-counter">0 / 400</div>
+                </div>
+                <div class="result-container">
+                    <h3>Resulting Mood</h3>
+                    <div id="mood-color-box" class="mood-color-box"></div>
+                    <p id="mood-name" class="mood-name">Neutral</p>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="sliders-container container">
+                    <p>What feeling did you have today?</p>
+                    <div class="slider-item">
+                        <div class="icon-container">
+                             <img src="images/emojis/happy.png" alt="Happy" class="emotion-icon">
+                        </div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="10" value="5" class="lever" id="happiness-slider">
+                        </div>
+                        <div class="progress-circle" id="happiness-pie"><span>5</span></div>
+                    </div>
+                    <div class="slider-item">
+                         <div class="icon-container">
+                             <img src="images/emojis/sad.png" alt="Sad" class="emotion-icon">
+                        </div>
+                         <div class="slider-wrapper">
+                            <input type="range" min="1" max="10" value="5" class="lever" id="sadness-slider">
+                        </div>
+                        <div class="progress-circle" id="sadness-pie"><span>5</span></div>
+                    </div>
+                    <div class="slider-item">
+                         <div class="icon-container">
+                             <img src="images/emojis/angry.png" alt="Angry" class="emotion-icon">
+                        </div>
+                         <div class="slider-wrapper">
+                            <input type="range" min="1" max="10" value="5" class="lever" id="anger-slider">
+                        </div>
+                        <div class="progress-circle" id="anger-pie"><span>5</span></div>
+                    </div>
+                    <div class="slider-item">
+                        <div class="icon-container">
+                             <img src="images/emojis/calm.png" alt="Calm" class="emotion-icon">
+                        </div>
+                         <div class="slider-wrapper">
+                            <input type="range" min="1" max="10" value="5" class="lever" id="calmness-slider">
+                        </div>
+                        <div class="progress-circle" id="calmness-pie"><span>5</span></div>
+                    </div>
+                </div>
+                <div class="sliders-container container">
+                     <div class="slider-item">
+                        <label>Hours studied:</label>
+                        <div class="slider-wrapper">
+                            <input type="range" min="0" max="24" value="8" class="lever" id="work-slider">
+                        </div>
+                        <div class="progress-circle" id="work-pie"><span>8</span></div>
+                    </div>
+                    <div class="slider-item">
+                        <label>Hours slept:</label>
+                        <div class="slider-wrapper">
+                            <input type="range" min="0" max="24" value="8" class="lever" id="sleep-slider">
+                        </div>
+                        <div class="progress-circle" id="sleep-pie"><span>8</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         <div class="action-buttons">
+            <button id="save-mood">SAVE LOG</button>
+            <button id="create-seed">CREATE SEED</button>
+        </div>
+    </main>
+
+    <script src="scripts/user-menu-script.js"></script>
+</body>
+</html>

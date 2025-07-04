@@ -1,0 +1,104 @@
+body {
+    font-family: 'Creato Display', sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    background-color: #A5D6A7;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #333;
+}
+
+.logo-container {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo {
+    width: 100px;
+    height: 100px;
+    background-image: url('../images/logo.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0 auto;
+}
+
+.logo-container p {
+    margin-top: 10px;
+    font-size: 18px;
+    font-family: 'Heavitas', sans-serif;
+}
+
+.nav {
+    width: 100%;
+    flex-grow: 1;
+}
+
+.nav a {
+    display: block;
+    background-color: #81C784;
+    color: #333;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 18px;
+    text-align: center;
+    font-family: 'Heavitas', sans-serif;
+}
+
+.nav a.active,
+.nav a:hover {
+    background-color: #66BB6A;
+}
+
+.footer {
+    font-size: 14px;
+    text-align: center;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 40px;
+    overflow-y: auto;
+    background-color: #FFF;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-family: 'Heavitas', sans-serif;
+    font-size: 36px;
+    margin: 0;
+}
+
+.header .date {
+    font-size: 20px;
+    color: #555;
+}
+
+.container {
+    background-color: #F5F5F5;
+    border: 1px solid #E0E0E0;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}

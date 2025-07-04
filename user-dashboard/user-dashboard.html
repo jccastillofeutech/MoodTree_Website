@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodTree - Dashboard</title>
+    <link rel="stylesheet" href="css-styling/user-menu-style.css">
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-auto-rows: minmax(0, 1fr);
+            gap: 30px;
+            flex-grow: 1;
+        }
+        .card {
+            background-color: #F5F5F5;
+            border: 1px solid #E0E0E0;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        .card h2 {
+            font-family: 'Heavitas', sans-serif;
+            margin-top: 0;
+            text-align: center;
+            color: #555;
+        }
+        .chart-container {
+            flex-grow: 1;
+            display: flex;
+            position: relative;
+            padding-left: 30px;
+            min-height: 0;
+        }
+        .y-axis {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            padding-right: 10px;
+            font-size: 12px;
+            color: #555;
+            text-align: right;
+        }
+        .hours-chart {
+            flex-grow: 1;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            border-left: 2px solid #ccc;
+            border-bottom: 2px solid #ccc;
+            height: 100%;
+        }
+        .bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 40%;
+            height: 100%;
+            justify-content: flex-end;
+        }
+        .bar {
+            width: 50px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 5px 5px 0 0;
+            transition: height 0.5s ease-out;
+            position: relative;
+        }
+        #work-bar {
+            background-color: #2E7D32;
+        }
+        #sleep-bar {
+            background-color: #689F38;
+        }
+        .bar-label {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .mood-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+        }
+        .mood-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #DDD;
+            margin-bottom: 20px;
+        }
+        .mood-name {
+            font-family: 'Heavitas', sans-serif;
+            font-size: 28px;
+            color: #333;
+        }
+        .progress-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+        }
+        .progress-pie {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background-color: #DDD;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .progress-pie::before {
+            content: '';
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            background: #FFF;
+            border-radius: 50%;
+        }
+        .progress-text {
+             position: relative;
+             font-size: 40px;
+             font-family: 'Heavitas', sans-serif;
+        }
+         .progress-label {
+            position: relative;
+            font-size: 16px;
+            color: #666;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .mood-levels {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            flex-grow: 1;
+            padding: 20px 0;
+        }
+        .level-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .level-bar-bg {
+            width: 30px;
+            height: 150px;
+            background-color: #E0E0E0;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column-reverse;
+        }
+        .level-bar {
+            width: 100%;
+            transition: height 0.5s ease-out;
+        }
+        .level-icon {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 10px;
+        }
+        /* Logout button style */
+        .logout-button {
+            background-color: #d32f2f; /* Red color for logout */
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 20px;
+            font-family: 'Heavitas', sans-serif;
+            transition: background-color 0.2s;
+            text-decoration: none; /* Ensure it looks like a button, not a link */
+            display: block; /* Make it a block element to take full width */
+        }
+
+        .logout-button:hover {
+            background-color: #b71c1c; /* Darker red on hover */
+        }
+    </style>
+</head>
+<body id="dashboard-page">
+
+    <div class="sidebar">
+        <div class="logo-container">
+            <div class="logo"></div>
+            <p id="username-display">Username</p>
+        </div>
+        <nav class="nav">
+            <a href="user-dashboard.html" class="active">DASHBOARD</a>
+            <a href="log-mood.html">LOG MOODS</a>
+            <a href="tree-simulator.html">SIMULATOR</a>
+            <a href="user-calendar.html">CALENDAR</a>
+            <a href="resources-info.html">RESOURCES</a>
+        </nav>
+        <a href="#" id="logout-button" class="logout-button">LOG OUT</a>
+        <div class="footer">
+            <p>&copy; 2025 MoodTree.<br>All Rights Reserved.</p>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>DASHBOARD</h1>
+            <div class="date"></div>
+        </header>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h2>Today's Hours</h2>
+                <div class="chart-container">
+                    <div class="y-axis">
+                        <span>24</span>
+                        <span>20</span>
+                        <span>16</span>
+                        <span>12</span>
+                        <span>8</span>
+                        <span>4</span>
+                        <span>0</span>
+                    </div>
+                    <div class="hours-chart">
+                        <div class="bar-group">
+                            <div id="work-bar" class="bar" style="height: 0%;">0</div>
+                            <span class="bar-label">Hours studied</span>
+                        </div>
+                        <div class="bar-group">
+                            <div id="sleep-bar" class="bar" style="height: 0%;">0</div>
+                            <span class="bar-label">Hours slept</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                 <h2>Mood Tracking Progress</h2>
+                 <div class="progress-container">
+                     <div id="progress-pie" class="progress-pie">
+                         <span id="progress-text" class="progress-text">0%</span>
+                     </div>
+                     <span class="progress-label">of the month tracked</span>
+                 </div>
+            </div>
+
+            <div class="card">
+                <h2>Today's Mood</h2>
+                <div class="mood-display">
+                    <div id="mood-display-color" class="mood-circle"></div>
+                    <span id="mood-display-name" class="mood-name">NOT LOGGED</span>
+                </div>
+                 <div id="notes-display" style="text-align: center; margin-top: 10px; color: #555;"></div>
+            </div>
+
+            <div class="card">
+                 <h2>Mood Levels Today</h2>
+                 <div class="mood-levels">
+                     <div class="level-group">
+                         <img src="images/emojis/happy.png" alt="Happy" class="level-icon">
+                         <div class="level-bar-bg">
+                            <div id="happiness-level" class="level-bar" style="background-color: #4CAF50; height: 0%;"></div>
+                         </div>
+                     </div>
+                      <div class="level-group">
+                         <img src="images/emojis/sad.png" alt="Sad" class="level-icon">
+                         <div class="level-bar-bg">
+                            <div id="sadness-level" class="level-bar" style="background-color: #FFC107; height: 0%;"></div>
+                         </div>
+                     </div>
+                      <div class="level-group">
+                         <img src="images/emojis/angry.png" alt="Angry" class="level-icon">
+                         <div class="level-bar-bg">
+                            <div id="anger-level" class="level-bar" style="background-color: #F44336; height: 0%;"></div>
+                         </div>
+                     </div>
+                      <div class="level-group">
+                         <img src="images/emojis/calm.png" alt="Calm" class="level-icon">
+                         <div class="level-bar-bg">
+                            <div id="calmness-level" class="level-bar" style="background-color: #2196F3; height: 0%;"></div>
+                         </div>
+                     </div>
+                 </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="scripts/user-menu-script.js"></script>
+</body>
+</html>

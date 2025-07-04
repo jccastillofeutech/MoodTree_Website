@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodTree - Simulator</title>
+    <link rel="stylesheet" href="css-styling/user-menu-style.css">
+    <style>
+        .simulator-container {
+            display: flex;
+            height: 100%;
+            width: 100%;
+        }
+        .main-view {
+            flex-grow: 1;
+            background: linear-gradient(to bottom, #87CEEB, #90EE90);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            overflow: hidden;
+        }
+        .sun {
+            width: 100px;
+            height: 100px;
+            background-color: #FFD700;
+            border-radius: 50%;
+            position: absolute;
+            top: 50px;
+            right: 50px;
+            box-shadow: 0 0 30px #FFD700;
+        }
+        .ground {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 250px;
+            background-image: url('images/simulator-images/simulator-grass.png');
+            background-size: cover;
+            background-position: bottom center;
+            background-repeat: no-repeat;
+        }
+        #mound {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 150px;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            display: none;
+            border-radius: 50% 50% 0 0;
+        }
+
+        #tree-container {
+            position: absolute;
+            bottom: 120px; 
+            z-index: 1;
+            cursor: pointer;
+            display: none; 
+            width: 400px;
+            height: 500px; 
+        }
+        .trunk {
+            background-color: #80461B;
+            transition: all 0.5s ease-in-out;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .canopy {
+            position: absolute;
+            width: 100%; 
+            left: 50%;
+            transform: translateX(-50%); 
+            transition: all 0.5s ease-in-out;
+        }
+        .canopy div {
+            position: absolute;
+            background-color: var(--leaf-color, #4CAF50);
+            display: none; 
+        }
+        
+        .canopy.complex-shape { background: transparent; }
+
+        .stage-1 .trunk { display: none; }
+        .stage-1 .canopy { 
+            width: 25px; 
+            height: 35px; 
+            border-radius: 50% 50% 10% 10%; 
+            bottom: 0; 
+            background: var(--leaf-color); 
+            display: block;
+        }
+        .stage-1 .canopy div { display: none; }
+
+        .stage-2 .trunk { 
+            width: 8px; 
+            height: 50px; 
+            border-radius: 4px 4px 0 0; 
+            display: block;
+        }
+        .stage-2 .canopy { 
+            width: 30px; 
+            height: 40px; 
+            bottom: 50px; 
+            transform: translateX(-50%); 
+            border-radius: 50% 50% 10% 10%; 
+            background: transparent;
+        }
+        .stage-2 .leaf-1, .stage-2 .leaf-2 { display: block;}
+        .stage-2 .leaf-1 { width: 25px; height: 35px; border-radius: 50% 50% 10% 10%; transform: rotate(-45deg); left: -15px; top: 5px; }
+        .stage-2 .leaf-2 { width: 25px; height: 35px; border-radius: 50% 50% 10% 10%; transform: rotate(45deg); right: -15px; top: 5px; }
+        .stage-2 .leaf-3, .stage-2 .leaf-4, .stage-2 .leaf-5, .stage-2 .leaf-6 { display: none; }
+
+        .stage-3 .trunk { 
+            width: 25px; 
+            height: 120px; 
+            display: block;
+        }
+        .stage-3 .canopy { 
+            width: 140px; 
+            height: 120px; 
+            bottom: 120px; 
+            transform: translateX(-50%); 
+            border-radius: 50%; 
+            background: transparent;
+        }
+        .stage-3 .leaf-1, .stage-3 .leaf-2, .stage-3 .leaf-3 { display: block; }
+        .stage-3 .leaf-1 { width: 100px; height: 100px; border-radius: 50%; top: 10px; left: -50px; }
+        .stage-3 .leaf-2 { width: 100px; height: 100px; border-radius: 50%; top: 10px; right: -50px; }
+        .stage-3 .leaf-3 { width: 120px; height: 120px; border-radius: 50%; top: -30px; left: 10px; z-index: -1;}
+        .stage-3 .leaf-4, .stage-3 .leaf-5, .stage-3 .leaf-6 { display: none; }
+
+        .stage-4 .trunk { 
+            width: 50px; 
+            height: 200px; 
+            border-radius: 20px 20px 0 0;
+            display: block;
+        }
+        .stage-4 .trunk::after { 
+            content:''; 
+            position: absolute; 
+            bottom:-10px; 
+            left:-10px; 
+            width: 70px; 
+            height:20px; 
+            background: #80461B; 
+            border-radius: 0 0 50% 50%;
+        }
+        .stage-4 .canopy { 
+            width: 350px; 
+            height: 400px; 
+            background: transparent; 
+            bottom: 200px; 
+            transform: translateX(-50%); 
+        }
+
+        .type-rounded .canopy div { border-radius: 50%; display: block;}
+        .type-rounded .leaf-1 { width: 250px; height: 250px; top: 50px; left: -50px; }
+        .type-rounded .leaf-2 { width: 250px; height: 250px; top: 50px; right: -50px; }
+        .type-rounded .leaf-3 { width: 280px; height: 280px; top: 0px; left: 35px; z-index: -1; }
+        .type-rounded .leaf-4, .type-rounded .leaf-5, .type-rounded .leaf-6 { display: none; }
+        
+        .type-pine .trunk { 
+            height: 280px; 
+            width: 40px;
+        }
+        .type-pine .canopy { 
+            height: 250px; 
+            bottom: 280px; 
+            transform: translateX(-50%); 
+        }
+        .type-pine .canopy div { 
+            clip-path: polygon(50% 0%, 100% 100%, 0% 100%); 
+            left: 50%; 
+            transform: translateX(-50%);
+            display: block;
+        }
+        .type-pine .leaf-1 { width: 100px; height: 120px; top: 0; z-index: 3;}
+        .type-pine .leaf-2 { width: 200px; height: 150px; top: 70px; z-index: 2;}
+        .type-pine .leaf-3 { width: 300px; height: 180px; top: 140px; z-index: 1;}
+        .type-pine .leaf-4, .type-pine .leaf-5, .type-pine .leaf-6 { display: none; }
+
+        .type-columnar .trunk { 
+            width: 30px; 
+            height: 250px; 
+        }
+        .type-columnar .canopy { 
+            width: 120px; 
+            height: 350px; 
+            border-radius: 60px 60px 10px 10px; 
+            bottom: 250px; 
+            transform: translateX(-50%); 
+            background-color: var(--leaf-color); 
+        }
+        .type-columnar .canopy div { display: none; }
+        
+        .type-weeping .trunk { 
+            width: 70px; 
+            height: 180px; 
+            border-radius: 10px; 
+        }
+        .type-weeping .canopy { 
+            width: 320px; 
+            height: 200px; 
+            border-radius: 50% 50% 40% 40%; 
+            background-color: var(--leaf-color); 
+            bottom: 180px; 
+            transform: translateX(-50%); 
+        }
+        .type-weeping .canopy div { border-radius: 0 0 100% 100%; background: linear-gradient(to bottom, var(--leaf-color), transparent); display: block;}
+        .type-weeping .leaf-1 { width: 120px; height: 180px; left: 20px; bottom: -140px; transform: rotate(20deg); }
+        .type-weeping .leaf-2 { width: 120px; height: 180px; right: 20px; bottom: -140px; transform: rotate(-20deg); }
+        .type-weeping .leaf-3 { width: 150px; height: 180px; bottom: -100px; left: 85px; }
+        .type-weeping .leaf-4, .type-weeping .leaf-5, .type-weeping .leaf-6 { display: none; }
+
+
+        .progress-bar-container {
+            width: 80%; height: 20px; background-color: rgba(255,255,255,0.5); border-radius: 10px;
+            position: absolute; bottom: 20px; z-index: 10;
+        }
+        #growth-progress {
+            width: 0%; height: 100%; background-color: #4CAF50; border-radius: 10px; transition: width 0.2s;
+        }
+        .controls {
+            width: 150px; background-color: #5D4037; padding: 20px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 20px;
+        }
+        .control-button {
+            width: 100px; height: 100px; background-color: #F5F5F5; border-radius: 50%;
+            border: 4px solid #A1887F; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .control-button:disabled { background-color: #ccc; cursor: not-allowed; border-color: #999; }
+        .control-button img { width: 80px; height: 80px; }
+        .notification-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6);
+            z-index: 10; display: none; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box;
+        }
+        .notification-box {
+            background: #fff; padding: 30px; border-radius: 12px; text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); max-width: 400px;
+        }
+        .notification-box h3 { font-family: 'Heavitas', sans-serif; margin-top: 0; color: #333; }
+        .notification-box p { color: #555; line-height: 1.6; }
+        .notification-box button {
+            font-family: 'Heavitas', sans-serif; background-color: #81C784; color: white; border: none;
+            padding: 12px 25px; border-radius: 8px; cursor: pointer; margin-top: 15px; font-size: 16px;
+            transition: background-color 0.2s;
+        }
+        .notification-box button:hover { background-color: #66BB6A; }
+        /* Logout button style */
+        .logout-button {
+            background-color: #d32f2f; /* Red color for logout */
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 20px;
+            font-family: 'Heavitas', sans-serif;
+            transition: background-color 0.2s;
+            text-decoration: none; /* Ensure it looks like a button, not a link */
+            display: block; /* Make it a block element to take full width */
+        }
+
+        .logout-button:hover {
+            background-color: #b71c1c; /* Darker red on hover */
+        }
+    </style>
+</head>
+<body id="simulator-page">
+
+    <div class="sidebar">
+        <div class="logo-container">
+            <div class="logo"></div>
+            <p id="username-display">Username</p>
+        </div>
+        <nav class="nav">
+            <a href="user-dashboard.html">DASHBOARD</a>
+            <a href="log-mood.html">LOG MOODS</a>
+            <a href="tree-simulator.html" class="active">SIMULATOR</a>
+            <a href="user-calendar.html">CALENDAR</a>
+            <a href="resources-info.html">RESOURCES</a>
+        </nav>
+        <a href="#" id="logout-button" class="logout-button">LOG OUT</a>
+        <div class="footer">
+            <p>&copy; 2025 MoodTree.<br>All Rights Reserved.</p>
+        </div>
+    </div>
+
+    <main class="main-content" style="padding: 0;">
+        <div class="simulator-container">
+            <div class="main-view">
+                 <div id="notification-overlay" class="notification-overlay">
+                    <div class="notification-box">
+                        <h3>Create a Seed First!</h3>
+                        <p>You need to log your mood for the day to grow a tree. Let's go do that now.</p>
+                        <button id="redirect-log-mood">Go to Log Mood</button>
+                    </div>
+                </div>
+                <div class="sun"></div>
+                <div class="ground"></div>
+                <div id="mound"></div>
+                <div id="tree-container">
+                    <div class="trunk"></div>
+                    <div class="canopy">
+                        <div class="leaf-1"></div>
+                        <div class="leaf-2"></div>
+                        <div class="leaf-3"></div>
+                        <div class="leaf-4"></div>
+                        <div class="leaf-5"></div>
+                        <div class="leaf-6"></div>
+                    </div>
+                </div>
+                <div class="progress-bar-container">
+                    <div id="growth-progress"></div>
+                </div>
+            </div>
+            <div class="controls">
+                <button id="plant-seed" class="control-button"><img src="images/controls/plant.png" alt="Plant"></button>
+                <button id="water-seed" class="control-button"><img src="images/controls/water.png" alt="Water"></button>
+                <button id="fertilize-seed" class="control-button"><img src="images/controls/fertilize.png" alt="Fertilize"></button>
+                <button id="shovel-tree" class="control-button"><img src="images/controls/shovel.png" alt="Shovel"></button>
+            </div>
+        </div>
+    </main>
+
+    <script src="scripts/user-menu-script.js"></script>
+</body>
+</html>
