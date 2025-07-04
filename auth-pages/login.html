@@ -29,6 +29,9 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            background-image: url('../images/auth-pages-background/log-in-background.jpg');
+            background-size: cover;
+            background-position: center;
         }
         h1 {
             font-family: var(--header-font);
@@ -49,7 +52,7 @@
             max-width: 420px;
             box-sizing: border-box;
             margin: 1rem;
-            position: relative; 
+            position: relative;
         }
         .back-link {
             position: absolute;
@@ -119,12 +122,19 @@
             margin-top: 1.5rem;
             text-align: center;
         }
+        .logo-img {
+            display: block;
+            margin: 0 auto 1.5rem auto;
+            max-width: 150px;
+            height: auto;
+        }
     </style>
 </head>
 <body>
 
     <div class="form-container">
         <a href="../index.html" class="back-link" aria-label="Go back to home page"><i class="fas fa-arrow-left"></i></a>
+        <img src="../images/logo.png" alt="MoodTree Logo" class="logo-img">
         <h1>LOG IN</h1>
         <form id="login-form">
             <div class="input-group">
@@ -150,11 +160,9 @@
         loginForm.addEventListener('submit', function(event) {
             event.preventDefault();
 
-           
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-       
             const storedData = localStorage.getItem('userData');
 
             if (!storedData) {
@@ -165,14 +173,10 @@
 
             const userData = JSON.parse(storedData);
 
-           
             if (email === userData.email && password === userData.password) {
-                
                 localStorage.setItem('loggedInUser', userData.fullname);
-
                 window.location.href = `../user-dashboard/user-dashboard.html?username=${encodeURIComponent(userData.fullname)}`;
             } else {
-        
                 notification.textContent = 'Invalid email or password.';
                 notification.style.display = 'block';
             }

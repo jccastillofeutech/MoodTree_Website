@@ -27,6 +27,9 @@
             align-items: center;
             min-height: 100vh;
             padding: 1rem 0;
+            background-image: url('../images/auth-pages-background/sign-up-background.jpg');
+            background-size: cover;
+            background-position: center;
         }
         h1 {
             font-family: var(--header-font);
@@ -122,12 +125,19 @@
             border-left-color: #f56565;
             color: #c53030;
         }
+        .logo-img {
+            display: block;
+            margin: 0 auto 1.5rem auto;
+            max-width: 150px;
+            height: auto;
+        }
     </style>
 </head>
 <body>
 
     <div class="form-container">
         <a href="../index.html" class="back-link" aria-label="Go back to home page"><i class="fas fa-arrow-left"></i></a>
+        <img src="../images/logo.png" alt="MoodTree Logo" class="logo-img">
         <h1>SIGN UP</h1>
         <form id="signup-form">
             <div class="input-group">
@@ -155,43 +165,38 @@
         const notification = document.getElementById('notification');
 
         signupForm.addEventListener('submit', function(event) {
-            event.preventDefault(); 
-            
+            event.preventDefault();
 
             const fullname = document.getElementById('fullname').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-           
             if (!fullname || !email || !password) {
                 notification.textContent = "Please fill in all fields.";
-                notification.className = 'notification error'; 
+                notification.className = 'notification error';
                 notification.style.display = 'block';
                 return;
             }
 
-           
             const storedData = localStorage.getItem('userData');
             if (storedData) {
                 const userData = JSON.parse(storedData);
                 if (userData.email === email) {
                     notification.textContent = "An account with this email already exists. Please log in.";
-                    notification.className = 'notification error'; 
+                    notification.className = 'notification error';
                     notification.style.display = 'block';
                     return;
                 }
             }
 
-         
             const newUserData = {
                 fullname: fullname,
                 email: email,
-                password: password 
+                password: password
             };
             localStorage.setItem('userData', JSON.stringify(newUserData));
-            localStorage.setItem('loggedInUser', fullname); 
+            localStorage.setItem('loggedInUser', fullname);
 
-      
             window.location.href = `../user-dashboard/user-dashboard.html?username=${encodeURIComponent(fullname)}`;
         });
     </script>
