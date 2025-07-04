@@ -1,4 +1,4 @@
-# Group_6G_TW01_IT0043L_MoodTree
+# MoodTree Website
 
 <h1>MoodTree</h1>
 
