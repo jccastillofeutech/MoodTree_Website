@@ -167,8 +167,10 @@
 
             // Check if credentials match
             if (email === userData.email && password === userData.password) {
+                // Set logged-in user in localStorage
+                localStorage.setItem('loggedInUser', userData.fullname);
                 // Redirect to dashboard on successful login
-                window.location.href = `../user-dashboard/dashboard.html?username=${encodeURIComponent(userData.fullname)}`;
+                window.location.href = `../user-dashboard/user-dashboard.html?username=${encodeURIComponent(userData.fullname)}`;
             } else {
                 // Show error message
                 notification.textContent = 'Invalid email or password.';
