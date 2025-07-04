@@ -49,7 +49,7 @@
             max-width: 420px;
             box-sizing: border-box;
             margin: 1rem;
-            position: relative; /* Added for positioning the back button */
+            position: relative; 
         }
         .back-link {
             position: absolute;
@@ -150,11 +150,11 @@
         loginForm.addEventListener('submit', function(event) {
             event.preventDefault();
 
-            // Get user input
+           
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            // Get stored data from localStorage
+       
             const storedData = localStorage.getItem('userData');
 
             if (!storedData) {
@@ -165,14 +165,14 @@
 
             const userData = JSON.parse(storedData);
 
-            // Check if credentials match
+           
             if (email === userData.email && password === userData.password) {
-                // Set logged-in user in localStorage
+                
                 localStorage.setItem('loggedInUser', userData.fullname);
-                // Redirect to dashboard on successful login
+
                 window.location.href = `../user-dashboard/user-dashboard.html?username=${encodeURIComponent(userData.fullname)}`;
             } else {
-                // Show error message
+        
                 notification.textContent = 'Invalid email or password.';
                 notification.style.display = 'block';
             }
