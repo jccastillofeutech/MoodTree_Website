@@ -47,7 +47,7 @@
             max-width: 420px;
             box-sizing: border-box;
             margin: 1rem;
-            position: relative; /* Added for positioning the back button */
+            position: relative;
         }
         .back-link {
             position: absolute;
@@ -155,43 +155,43 @@
         const notification = document.getElementById('notification');
 
         signupForm.addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent the form from submitting the traditional way
+            event.preventDefault(); 
+            
 
-            // Get user input
             const fullname = document.getElementById('fullname').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            // Simple validation
+           
             if (!fullname || !email || !password) {
                 notification.textContent = "Please fill in all fields.";
-                notification.className = 'notification error'; // Add error class
+                notification.className = 'notification error'; 
                 notification.style.display = 'block';
                 return;
             }
 
-            // Check if account with this email already exists
+           
             const storedData = localStorage.getItem('userData');
             if (storedData) {
                 const userData = JSON.parse(storedData);
                 if (userData.email === email) {
                     notification.textContent = "An account with this email already exists. Please log in.";
-                    notification.className = 'notification error'; // Add error class
+                    notification.className = 'notification error'; 
                     notification.style.display = 'block';
                     return;
                 }
             }
 
-            // Store new user data in localStorage
+         
             const newUserData = {
                 fullname: fullname,
                 email: email,
-                password: password // In a real app, NEVER store passwords in plain text. This is for demonstration only.
+                password: password 
             };
             localStorage.setItem('userData', JSON.stringify(newUserData));
-            localStorage.setItem('loggedInUser', fullname); // Set the newly signed-up user as logged in
+            localStorage.setItem('loggedInUser', fullname); 
 
-            // Redirect to the dashboard page, passing the username
+      
             window.location.href = `../user-dashboard/user-dashboard.html?username=${encodeURIComponent(fullname)}`;
         });
     </script>
