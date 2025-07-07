@@ -366,6 +366,7 @@ function loadDashboardData() {
     const month = today.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     
+    // Mood progress is calculated based on 'moodHistory', which is updated only after a tree is 'shoveled'.
     const history = JSON.parse(localStorage.getItem('moodHistory')) || {};
     const trackedDays = Object.keys(history).length; 
     
