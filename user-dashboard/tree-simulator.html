@@ -6,6 +6,7 @@
     <title>MoodTree - Simulator</title>
     <link rel="stylesheet" href="css-styling/user-menu-style.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=REM:ital,wght@0,100..900;1,100..900&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
         .simulator-container {
             display: flex;
             height: 100%;
@@ -243,15 +244,14 @@
             background: #fff; padding: 30px; border-radius: 12px; text-align: center;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3); max-width: 400px;
         }
-        .notification-box h3 { font-family: 'Heavitas', sans-serif; margin-top: 0; color: #333; }
+        .notification-box h3 { font-family: 'REM', sans-serif; margin-top: 0; color: #333; }
         .notification-box p { color: #555; line-height: 1.6; }
         .notification-box button {
-            font-family: 'Heavitas', sans-serif; background-color: #81C784; color: white; border: none;
+            font-family: 'REM', sans-serif; background-color: #81C784; color: white; border: none;
             padding: 12px 25px; border-radius: 8px; cursor: pointer; margin-top: 15px; font-size: 16px;
             transition: background-color 0.2s;
         }
         .notification-box button:hover { background-color: #66BB6A; }
-      
         .logout-button {
             background-color: #d32f2f;
             color: white;
@@ -260,14 +260,195 @@
             text-align: center;
             cursor: pointer;
             margin-top: 20px;
-            font-family: 'Heavitas', sans-serif;
+            font-family: 'REM', sans-serif;
             transition: background-color 0.2s;
             text-decoration: none;
-            display: block; 
+            display: block;
         }
 
         .logout-button:hover {
             background-color: #b71c1c;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            body {
+                flex-direction: column;
+                height: 100vh;
+                overflow-x: hidden;
+                position: relative;
+            }
+            .main-content {
+                padding: 0;
+                flex-grow: 1;
+                overflow-y: auto;
+            }
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                margin-bottom: 0;
+                position: sticky;
+                top: 0;
+                background-color: #FFF;
+                padding: 10px 15px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                z-index: 100;
+            }
+            .header h1 {
+                font-size: 28px;
+            }
+            .header .date {
+                font-size: 16px;
+            }
+
+            .hamburger-icon {
+                display: block;
+            }
+
+            .menu-toggle:checked + .hamburger-icon + .mobile-nav {
+                transform: translateX(0%);
+            }
+
+            .menu-toggle:checked ~ .main-content {
+                transform: translateX(280px);
+                overflow: hidden;
+            }
+            .main-content {
+                transition: transform 0.3s ease-in-out;
+            }
+
+
+            .simulator-container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .main-view {
+                height: auto;
+                min-height: 50vh;
+                padding-bottom: 100px;
+            }
+
+            .sun {
+                width: 80px;
+                height: 80px;
+                top: 20px;
+                right: 20px;
+            }
+
+            .ground {
+                height: 150px;
+            }
+
+            #mound {
+                margin-bottom: 80px;
+            }
+
+            #tree-container {
+                bottom: 60px;
+                width: 300px;
+                height: 400px;
+            }
+
+            .stage-4 .trunk {
+                width: 40px;
+                height: 150px;
+            }
+            .stage-4 .canopy {
+                width: 280px;
+                height: 320px;
+                bottom: 150px;
+            }
+            .type-rounded .leaf-1, .type-rounded .leaf-2 {
+                width: 200px;
+                height: 200px;
+            }
+            .type-rounded .leaf-3 {
+                width: 220px;
+                height: 220px;
+            }
+            .type-pine .trunk {
+                height: 200px;
+                width: 30px;
+            }
+            .type-pine .canopy {
+                height: 180px;
+                bottom: 200px;
+            }
+            .type-pine .leaf-1 {
+                width: 80px;
+                height: 100px;
+            }
+            .type-pine .leaf-2 {
+                width: 160px;
+                height: 120px;
+            }
+            .type-pine .leaf-3 {
+                width: 240px;
+                height: 150px;
+            }
+            .type-columnar .trunk {
+                width: 25px;
+                height: 180px;
+            }
+            .type-columnar .canopy {
+                width: 100px;
+                height: 280px;
+                bottom: 180px;
+            }
+            .type-weeping .trunk {
+                width: 60px;
+                height: 140px;
+            }
+            .type-weeping .canopy {
+                width: 280px;
+                height: 160px;
+                bottom: 140px;
+            }
+            .type-weeping .leaf-1, .type-weeping .leaf-2 {
+                width: 100px;
+                height: 150px;
+                bottom: -120px;
+            }
+            .type-weeping .leaf-3 {
+                width: 120px;
+                height: 150px;
+                bottom: -80px;
+            }
+
+
+            .progress-bar-container {
+                width: 90%;
+                bottom: 10px;
+            }
+
+            .controls {
+                width: 100%;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .control-button {
+                width: 70px;
+                height: 70px;
+                border-width: 2px;
+            }
+            .control-button img {
+                width: 50px;
+                height: 50px;
+            }
+
+            .notification-box {
+                padding: 20px;
+                max-width: 90%;
+            }
         }
     </style>
 </head>
@@ -291,7 +472,22 @@
         </div>
     </div>
 
-    <main class="main-content" style="padding: 0;">
+    <main class="main-content">
+        <header class="header">
+            <h1>SIMULATOR</h1>
+            <input type="checkbox" id="menu-toggle" class="menu-toggle">
+            <label for="menu-toggle" class="hamburger-icon">
+                <i class="fas fa-bars"></i>
+            </label>
+            <nav class="mobile-nav">
+                <a href="user-dashboard.html">DASHBOARD</a>
+                <a href="log-mood.html">LOG MOODS</a>
+                <a href="tree-simulator.html" class="active">SIMULATOR</a>
+                <a href="user-calendar.html">CALENDAR</a>
+                <a href="resources-info.html">RESOURCES</a>
+                <a href="#" id="mobile-logout-button" class="logout-button">LOG OUT</a>
+            </nav>
+        </header>
         <div class="simulator-container">
             <div class="main-view">
                  <div id="notification-overlay" class="notification-overlay">

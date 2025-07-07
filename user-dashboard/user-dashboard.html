@@ -6,6 +6,7 @@
     <title>MoodTree - Dashboard</title>
     <link rel="stylesheet" href="css-styling/user-menu-style.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=REM:ital,wght@0,100..900;1,100..900&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -23,7 +24,7 @@
             flex-direction: column;
         }
         .card h2 {
-            font-family: 'Heavitas', sans-serif;
+            font-family: 'REM', sans-serif;
             margin-top: 0;
             text-align: center;
             color: #555;
@@ -98,7 +99,7 @@
             margin-bottom: 20px;
         }
         .mood-name {
-            font-family: 'Heavitas', sans-serif;
+            font-family: 'REM', sans-serif;
             font-size: 28px;
             color: #333;
         }
@@ -130,7 +131,7 @@
         .progress-text {
              position: relative;
              font-size: 40px;
-             font-family: 'Heavitas', sans-serif;
+             font-family: 'REM', sans-serif;
         }
          .progress-label {
             position: relative;
@@ -170,23 +171,118 @@
             height: 60px;
             margin-bottom: 10px;
         }
-       
         .logout-button {
-            background-color: #d32f2f; 
+            background-color: #d32f2f;
             color: white;
             padding: 10px 15px;
             border-radius: 8px;
             text-align: center;
             cursor: pointer;
             margin-top: 20px;
-            font-family: 'Heavitas', sans-serif;
+            font-family: 'REM', sans-serif;
             transition: background-color 0.2s;
-            text-decoration: none; 
-            display: block; 
+            text-decoration: none;
+            display: block;
         }
 
         .logout-button:hover {
             background-color: #b71c1c;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            body {
+                flex-direction: column;
+                height: 100vh;
+                overflow-x: hidden;
+                position: relative;
+            }
+            .main-content {
+                padding: 15px;
+                flex-grow: 1;
+                overflow-y: auto;
+            }
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                margin-bottom: 20px;
+                position: sticky;
+                top: 0;
+                background-color: #FFF;
+                padding: 10px 15px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                z-index: 100;
+            }
+            .header h1 {
+                font-size: 28px;
+            }
+            .header .date {
+                font-size: 16px;
+            }
+
+            .hamburger-icon {
+                display: block;
+            }
+
+            .menu-toggle:checked + .hamburger-icon + .mobile-nav {
+                transform: translateX(0%);
+            }
+
+            .menu-toggle:checked ~ .main-content {
+                transform: translateX(280px);
+                overflow: hidden;
+            }
+            .main-content {
+                transition: transform 0.3s ease-in-out;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .chart-container {
+                padding-left: 0;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .y-axis {
+                display: none;
+            }
+
+            .hours-chart {
+                width: 100%;
+                height: 200px;
+                border-left: none;
+                border-bottom: 2px solid #ccc;
+            }
+
+            .bar-group {
+                width: 45%;
+                height: 100%;
+                justify-content: flex-end;
+                margin-bottom: 10px;
+            }
+
+            .bar {
+                width: 80%;
+                height: 0;
+            }
+
+            .mood-levels {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
+            }
+
+            .level-group {
+                margin: 5px;
+            }
         }
     </style>
 </head>
@@ -214,6 +310,18 @@
         <header class="header">
             <h1>DASHBOARD</h1>
             <div class="date"></div>
+            <input type="checkbox" id="menu-toggle" class="menu-toggle">
+            <label for="menu-toggle" class="hamburger-icon">
+                <i class="fas fa-bars"></i>
+            </label>
+            <nav class="mobile-nav">
+                <a href="user-dashboard.html" class="active">DASHBOARD</a>
+                <a href="log-mood.html">LOG MOODS</a>
+                <a href="tree-simulator.html">SIMULATOR</a>
+                <a href="user-calendar.html">CALENDAR</a>
+                <a href="resources-info.html">RESOURCES</a>
+                <a href="#" id="mobile-logout-button" class="logout-button">LOG OUT</a>
+            </nav>
         </header>
 
         <div class="dashboard-grid">

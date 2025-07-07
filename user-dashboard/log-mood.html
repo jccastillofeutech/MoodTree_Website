@@ -6,6 +6,7 @@
     <title>MoodTree - Log Mood</title>
     <link rel="stylesheet" href="css-styling/user-menu-style.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=REM:ital,wght@0,100..900;1,100..900&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
         .log-mood-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -33,14 +34,14 @@
         }
         .notes-header h2 {
             margin: 0;
-            font-family: 'Heavitas', sans-serif;
+            font-family: 'REM', sans-serif;
             font-size: 20px;
         }
         #notes-area {
             flex-grow: 1;
             border: none;
             padding: 15px;
-            font-family: 'Creato Display', sans-serif;
+            font-family: 'Urbanist', sans-serif;
             font-size: 16px;
             resize: none;
             outline: none;
@@ -152,7 +153,7 @@
         .progress-circle span {
             position: relative;
             font-size: 20px;
-            font-family: 'Heavitas', sans-serif;
+            font-family: 'REM', sans-serif;
             color: #333;
         }
         .result-container {
@@ -170,7 +171,7 @@
             transition: background-color 0.3s ease;
         }
         .mood-name {
-            font-family: 'Heavitas', sans-serif;
+            font-family: 'REM', sans-serif;
             font-size: 24px;
         }
         .action-buttons {
@@ -180,7 +181,7 @@
             margin-top: 20px;
         }
         .action-buttons button {
-            font-family: 'Heavitas', sans-serif;
+            font-family: 'REM', sans-serif;
             font-size: 18px;
             padding: 15px 40px;
             border: none;
@@ -195,23 +196,166 @@
             background-color: #A1887F;
             color: white;
         }
-      
         .logout-button {
-            background-color: #d32f2f; 
+            background-color: #d32f2f;
             color: white;
             padding: 10px 15px;
             border-radius: 8px;
             text-align: center;
             cursor: pointer;
             margin-top: 20px;
-            font-family: 'Heavitas', sans-serif;
+            font-family: 'REM', sans-serif;
             transition: background-color 0.2s;
-            text-decoration: none; 
+            text-decoration: none;
             display: block;
         }
 
         .logout-button:hover {
             background-color: #b71c1c;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            body {
+                flex-direction: column;
+                height: 100vh;
+                overflow-x: hidden;
+                position: relative;
+            }
+            .main-content {
+                padding: 15px;
+                flex-grow: 1;
+                overflow-y: auto;
+            }
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                margin-bottom: 20px;
+                position: sticky;
+                top: 0;
+                background-color: #FFF;
+                padding: 10px 15px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                z-index: 100;
+            }
+            .header h1 {
+                font-size: 28px;
+            }
+            .header .date {
+                font-size: 16px;
+            }
+
+            .hamburger-icon {
+                display: block;
+            }
+
+            .menu-toggle:checked + .hamburger-icon + .mobile-nav {
+                transform: translateX(0%);
+            }
+
+            .menu-toggle:checked ~ .main-content {
+                transform: translateX(280px);
+                overflow: hidden;
+            }
+            .main-content {
+                transition: transform 0.3s ease-in-out;
+            }
+
+            .log-mood-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .left-panel, .right-panel {
+                gap: 15px;
+            }
+
+            .notes-container {
+                min-height: 200px;
+            }
+
+            .notes-header h2 {
+                font-size: 18px;
+            }
+
+            #notes-area {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            .sliders-container {
+                padding: 15px;
+                gap: 15px;
+            }
+
+            .slider-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .icon-container {
+                width: 50px;
+                height: 50px;
+            }
+            .emotion-icon {
+                width: 50px;
+                height: 50px;
+            }
+
+            .slider-item label {
+                width: auto;
+                font-size: 14px;
+            }
+
+            .lever {
+                height: 20px;
+            }
+            .lever::-webkit-slider-thumb, .lever::-moz-range-thumb {
+                width: 30px;
+                height: 30px;
+            }
+
+            .progress-circle {
+                width: 50px;
+                height: 50px;
+            }
+            .progress-circle::before {
+                width: 35px;
+                height: 35px;
+            }
+            .progress-circle span {
+                font-size: 16px;
+            }
+
+            .result-container {
+                padding: 15px;
+            }
+
+            .mood-color-box {
+                width: 80px;
+                height: 80px;
+            }
+
+            .mood-name {
+                font-size: 20px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 15px;
+            }
+
+            .action-buttons button {
+                width: 100%;
+                padding: 12px 20px;
+                font-size: 16px;
+            }
         }
     </style>
 </head>
@@ -239,6 +383,18 @@
         <header class="header">
             <h1>LOG MOOD</h1>
             <div class="date"></div>
+            <input type="checkbox" id="menu-toggle" class="menu-toggle">
+            <label for="menu-toggle" class="hamburger-icon">
+                <i class="fas fa-bars"></i>
+            </label>
+            <nav class="mobile-nav">
+                <a href="user-dashboard.html">DASHBOARD</a>
+                <a href="log-mood.html" class="active">LOG MOODS</a>
+                <a href="tree-simulator.html">SIMULATOR</a>
+                <a href="user-calendar.html">CALENDAR</a>
+                <a href="resources-info.html">RESOURCES</a>
+                <a href="#" id="mobile-logout-button" class="logout-button">LOG OUT</a>
+            </nav>
         </header>
 
         <div class="log-mood-container">

@@ -6,6 +6,7 @@
     <title>MoodTree - Resources</title>
     <link rel="stylesheet" href="css-styling/user-menu-style.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=REM:ital,wght@0,100..900;1,100..900&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
         .resources-content {
             display: flex;
             flex-direction: column;
@@ -23,7 +24,7 @@
             text-align: center;
         }
         .info-box h2 {
-            font-family: 'Heavitas', sans-serif;
+            font-family: 'REM', sans-serif;
             margin: 0 0 15px 0;
             color: #5D4037;
             font-size: 22px;
@@ -66,7 +67,7 @@
             max-height: 100%;
         }
         .hotline-card h3 {
-            font-family: 'Heavitas', sans-serif;
+            font-family: 'REM', sans-serif;
             margin: 0 0 10px 0;
         }
         .hotline-card p {
@@ -79,7 +80,6 @@
             font-weight: bold;
             font-size: 20px;
         }
-       
         .logout-button {
             background-color: #d32f2f;
             color: white;
@@ -88,14 +88,100 @@
             text-align: center;
             cursor: pointer;
             margin-top: 20px;
-            font-family: 'Heavitas', sans-serif;
+            font-family: 'REM', sans-serif;
             transition: background-color 0.2s;
-            text-decoration: none; 
-            display: block; 
+            text-decoration: none;
+            display: block;
         }
 
         .logout-button:hover {
             background-color: #b71c1c;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            body {
+                flex-direction: column;
+                height: 100vh;
+                overflow-x: hidden;
+                position: relative;
+            }
+            .main-content {
+                padding: 15px;
+                flex-grow: 1;
+                overflow-y: auto;
+            }
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                margin-bottom: 20px;
+                position: sticky;
+                top: 0;
+                background-color: #FFF;
+                padding: 10px 15px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                z-index: 100;
+            }
+            .header h1 {
+                font-size: 28px;
+            }
+            .header .date {
+                font-size: 16px;
+            }
+
+            .hamburger-icon {
+                display: block;
+            }
+
+            .menu-toggle:checked + .hamburger-icon + .mobile-nav {
+                transform: translateX(0%);
+            }
+
+            .menu-toggle:checked ~ .main-content {
+                transform: translateX(280px);
+                overflow: hidden;
+            }
+            .main-content {
+                transition: transform 0.3s ease-in-out;
+            }
+
+            .hotlines-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .info-box {
+                padding: 20px;
+            }
+
+            .info-box h2 {
+                font-size: 20px;
+            }
+
+            .hotline-card {
+                padding: 15px;
+            }
+
+            .hotline-logo {
+                width: 80px;
+                height: 80px;
+            }
+
+            .hotline-card h3 {
+                font-size: 18px;
+            }
+
+            .hotline-card p {
+                font-size: 14px;
+            }
+
+            .hotline-card .number {
+                font-size: 18px;
+            }
         }
     </style>
 </head>
@@ -120,6 +206,21 @@
     </div>
 
     <main class="main-content">
+        <header class="header">
+            <h1>RESOURCES</h1>
+            <input type="checkbox" id="menu-toggle" class="menu-toggle">
+            <label for="menu-toggle" class="hamburger-icon">
+                <i class="fas fa-bars"></i>
+            </label>
+            <nav class="mobile-nav">
+                <a href="user-dashboard.html">DASHBOARD</a>
+                <a href="log-mood.html">LOG MOODS</a>
+                <a href="tree-simulator.html">SIMULATOR</a>
+                <a href="user-calendar.html">CALENDAR</a>
+                <a href="resources-info.html" class="active">RESOURCES</a>
+                <a href="#" id="mobile-logout-button" class="logout-button">LOG OUT</a>
+            </nav>
+        </header>
         <div class="resources-content">
             <div class="info-box">
                 <h2>EXPERIENCING WORSE MENTAL HEALTH PROBLEMS? DIAL EMERGENCY!</h2>
