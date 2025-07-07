@@ -10,39 +10,43 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
- 
+    // Get username from URL or localStorage
     const urlParams = new URLSearchParams(window.location.search);
     let username = urlParams.get('username');
 
     if (username) {
-        
         localStorage.setItem('loggedInUser', username);
     } else {
-        
         username = localStorage.getItem('loggedInUser');
     }
 
-   
+    // Display username in sidebar
     const usernameDisplay = document.getElementById('username-display');
     if (usernameDisplay && username) {
         usernameDisplay.textContent = username;
     } else if (usernameDisplay) {
-        usernameDisplay.textContent = 'Guest'; 
+        usernameDisplay.textContent = 'Guest';
     }
 
-
+    // Setup logout button
     const logoutButton = document.getElementById('logout-button');
+    const mobileLogoutButton = document.getElementById('mobile-logout-button');
+
+    const commonLogoutHandler = (event) => {
+        event.preventDefault();
+        localStorage.removeItem('loggedInUser');
+        localStorage.removeItem('dailyMood');
+        localStorage.removeItem('tempMood');
+        localStorage.removeItem('treeState');
+        localStorage.removeItem('treeClicks');
+        window.location.href = '../auth-pages/login.html';
+    };
+
     if (logoutButton) {
-        logoutButton.addEventListener('click', (event) => {
-            event.preventDefault();
-            localStorage.removeItem('loggedInUser'); 
-            localStorage.removeItem('dailyMood'); 
-            localStorage.removeItem('tempMood'); 
-            localStorage.removeItem('treeState'); 
-            localStorage.removeItem('treeClicks'); 
-            
-            window.location.href = '../auth-pages/login.html'; 
-        });
+        logoutButton.addEventListener('click', commonLogoutHandler);
+    }
+    if (mobileLogoutButton) {
+        mobileLogoutButton.addEventListener('click', commonLogoutHandler);
     }
 
 
@@ -254,7 +258,6 @@ function setupLogMoodPage() {
         const dailyMood = JSON.parse(localStorage.getItem('dailyMood'));
         let dataToLoad = null;
 
-     
         if (dailyMood && dailyMood.date !== todayKey) {
             localStorage.removeItem('dailyMood');
         }
@@ -263,39 +266,32 @@ function setupLogMoodPage() {
             localStorage.removeItem('tempMood');
         }
 
-       
         const currentDailyMood = JSON.parse(localStorage.getItem('dailyMood'));
         const currentTempMood = JSON.parse(localStorage.getItem('tempMood'));
 
-    
         if (currentDailyMood && currentDailyMood.date === todayKey) {
-           
             dataToLoad = currentDailyMood;
             Object.values(sliders).forEach(s => s.disabled = true);
             createSeedButton.disabled = true;
             saveButton.disabled = true;
             notesArea.disabled = true;
         } else if (currentTempMood && currentTempMood.date === todayKey) {
-           
             dataToLoad = currentTempMood;
             Object.values(sliders).forEach(s => s.disabled = false);
             createSeedButton.disabled = false;
             saveButton.disabled = false;
             notesArea.disabled = false;
         } else {
-       
             Object.values(sliders).forEach(s => s.disabled = false);
             createSeedButton.disabled = false;
             saveButton.disabled = false;
             notesArea.disabled = false;
-          
             Object.keys(sliders).forEach(key => {
                 const defaultVal = key === 'work' || key === 'sleep' ? 8 : 5;
                 sliders[key].value = defaultVal;
             });
             notesArea.value = '';
         }
-        
         
         if (dataToLoad) {
              Object.keys(sliders).forEach(key => {
@@ -320,13 +316,11 @@ function loadDashboardData() {
     let dataToDisplay = JSON.parse(localStorage.getItem('dailyMood'));
 
     if (!dataToDisplay || dataToDisplay.date !== todayKey) {
-        // If dailyMood is not for today, try tempMood for today
         const tempMood = JSON.parse(localStorage.getItem('tempMood'));
-        if (tempMood && tempToad.date === todayKey) {
+        if (tempMood && tempMood.date === todayKey) {
             dataToDisplay = tempMood;
         } else {
-            
-            dataToDisplay = null; 
+            dataToDisplay = null;
         }
     }
 
@@ -352,7 +346,6 @@ function loadDashboardData() {
         document.getElementById('anger-level').style.height = `${(parseInt(dataToDisplay.anger) -1) * 11.1}%`;
         document.getElementById('calmness-level').style.height = `${(parseInt(dataToDisplay.calmness) -1) * 11.1}%`;
     } else {
-       
         const workBar = document.getElementById('work-bar');
         const sleepBar = document.getElementById('sleep-bar');
         workBar.style.height = '0%';
@@ -400,7 +393,6 @@ function setupSimulatorPage() {
     const dailyMood = JSON.parse(localStorage.getItem('dailyMood'));
     const todayKey = new Date().toISOString().split('T')[0];
 
-    
     const isSimulatorActive = dailyMood && dailyMood.status === 'created' && dailyMood.date === todayKey && state !== 'shoveled';
 
     if (!isSimulatorActive) {
@@ -412,15 +404,13 @@ function setupSimulatorPage() {
         if(notificationOverlay) notificationOverlay.style.display = 'flex';
         if(redirectBtn) redirectBtn.addEventListener('click', () => { window.location.href = 'log-mood.html'; });
 
-       
         if ((dailyMood && dailyMood.date !== todayKey) || (!dailyMood && state !== 'unplanted')) {
              localStorage.removeItem('treeState');
              localStorage.removeItem('treeClicks');
-             state = 'unplanted'; 
-             clicks = 0; 
+             state = 'unplanted';
+             clicks = 0;
         }
         
-
         if (state === 'shoveled') {
             mound.style.display = 'none';
             treeContainer.style.display = 'none';
@@ -430,7 +420,6 @@ function setupSimulatorPage() {
         return; 
     }
     
-   
     const moodColor = dailyMood.moodColor;
     const moodName = dailyMood.moodName;
     const treeType = getTreeType(dailyMood.valence, dailyMood.arousal);
@@ -443,10 +432,10 @@ function setupSimulatorPage() {
         fertilizeBtn.disabled = state !== 'watered';
         shovelBtn.disabled = state !== 'mature';
 
-       
         mound.style.display = 'none';
         treeContainer.style.display = 'none';
         if(notificationOverlay) notificationOverlay.style.display = 'none';
+
         if (state === 'unplanted') {
         } else if (state === 'planted') {
             mound.style.display = 'block';
@@ -470,10 +459,8 @@ function setupSimulatorPage() {
             }
         } 
 
-      
         const progress = Math.min((clicks / clicksNeeded) * 100, 100);
         progressBar.style.width = `${progress}%`;
-
 
         localStorage.setItem('treeState', state);
         localStorage.setItem('treeClicks', clicks);
@@ -511,10 +498,9 @@ function setupSimulatorPage() {
             history[todayKey] = { moodName, moodColor, treeType };
             localStorage.setItem('moodHistory', JSON.stringify(history));
             
-          
-            localStorage.removeItem('tempMood'); 
-            localStorage.removeItem('treeClicks'); 
-            localStorage.setItem('treeState', 'shoveled'); 
+            localStorage.removeItem('tempMood');
+            localStorage.removeItem('treeClicks');
+            localStorage.setItem('treeState', 'shoveled');
 
             const showMessage = (msg, callback) => {
                 const overlay = document.createElement('div');
@@ -551,7 +537,6 @@ function drawTree(clicks, treeType) {
     const trunk = tree.querySelector('.trunk');
     const canopy = tree.querySelector('.canopy');
 
-    
     tree.className = ''; 
     trunk.removeAttribute('style'); 
     canopy.removeAttribute('style'); 
