@@ -1,12 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=REM:ital,wght@0,100..900;1,100..900&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
 
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Urbanist', sans-serif;
     background-color: #f0f2f5;
     margin: 0;
     display: flex;
     height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
+    position: relative;
 }
 
 .sidebar {
@@ -14,7 +19,6 @@ body {
     flex-shrink: 0;
     background-color: #A5D6A7;
     padding: 20px;
-    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -29,7 +33,6 @@ body {
 .logo {
     width: 100px;
     height: 100px;
-    background-image: url('../images/logo.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -68,6 +71,14 @@ body {
 .footer {
     font-size: 14px;
     text-align: center;
+    color: #333;
+}
+
+.logo-footer {
+    width: 50px;
+    height: 50px;
+    margin-top: 20px;
+    margin-bottom: 5px;
 }
 
 .main-content {
@@ -77,6 +88,9 @@ body {
     background-color: #FFF;
     display: flex;
     flex-direction: column;
+    transition: transform 0.3s ease-in-out;
+    width: 100%;
+    left: 0;
 }
 
 .header {
@@ -84,12 +98,14 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
+    flex-wrap: wrap;
 }
 
 .header h1 {
     font-family: 'REM', sans-serif;
     font-size: 36px;
     margin: 0;
+    color: #333;
 }
 
 .header .date {
@@ -102,38 +118,40 @@ body {
     background-color: #F5F5F5;
     border: 1px solid #E0E0E0;
     border-radius: 12px;
-    padding: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.menu-toggle {
+.hamburger-button {
     display: none;
-}
-
-.hamburger-icon {
-    display: none;
+    background: none;
+    border: none;
     font-size: 1.8rem;
     cursor: pointer;
     color: #333;
     z-index: 101;
+    padding: 0;
+    line-height: 1;
 }
 
 .mobile-nav {
     position: fixed;
     top: 0;
-    right: 0;
+    right: -280px;
     width: 280px;
     height: 100%;
     background-color: #A5D6A7;
     z-index: 100;
     box-shadow: -2px 0 5px rgba(0,0,0,0.2);
-    transform: translateX(100%);
-    transition: transform 0.3s ease-in-out;
+    transition: right 0.3s ease-in-out;
     display: flex;
     flex-direction: column;
     padding-top: 80px;
     box-sizing: border-box;
     overflow-y: auto;
+}
+
+.mobile-nav.open {
+    right: 0;
 }
 
 .mobile-nav a {
@@ -152,6 +170,77 @@ body {
 .mobile-nav .logout-button {
     margin: 10px auto;
     width: calc(100% - 40px);
+    background-color: #d32f2f;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    font-family: 'REM', sans-serif;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    display: block;
+}
+
+.mobile-nav .logout-button:hover {
+    background-color: #b71c1c;
+}
+
+/* New styles for the mobile footer */
+.mobile-footer {
+    text-align: center;
+    margin-top: auto; /* Pushes the footer to the bottom */
+    padding: 20px;
+    color: #333;
+}
+
+.mobile-footer .logo-footer {
+    width: 80px; /* Adjust size as needed for mobile */
+    height: 80px;
+    margin-bottom: 10px;
+}
+
+.mobile-footer p {
+    font-size: 12px; /* Adjust font size for mobile */
+    color: #555;
+    margin: 0;
+}
+
+
+.logout-button {
+    background-color: #d32f2f;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 20px;
+    font-family: 'REM', sans-serif;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    display: block;
+}
+
+.logout-button:hover {
+    background-color: #b71c1c;
+}
+
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+}
+
+.overlay.active {
+    display: block;
+    opacity: 1;
 }
 
 @media (max-width: 768px) {
@@ -161,13 +250,18 @@ body {
     body {
         flex-direction: column;
         height: 100vh;
-        overflow-x: hidden;
         position: relative;
+        overflow-x: hidden;
     }
     .main-content {
         padding: 15px;
         flex-grow: 1;
         overflow-y: auto;
+        width: 100%;
+        position: static;
+        left: auto;
+        transition: none;
+        z-index: auto;
     }
     .header {
         display: flex;
@@ -179,6 +273,7 @@ body {
         top: 0;
         background-color: #FFF;
         padding: 10px 15px;
+        padding-right: 50px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         z-index: 100;
     }
@@ -189,25 +284,24 @@ body {
         font-size: 16px;
     }
 
-    .hamburger-icon {
+    .hamburger-button {
         display: block;
         position: absolute;
         right: 15px;
-        top: 10px;
-        transform: none;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 101;
     }
 
-    .menu-toggle:checked + .hamburger-icon + .mobile-nav {
-        transform: translateX(0%); 
+    .log-table-container {
+        overflow-x: auto;
+        width: 100%;
+        max-width: 100%;
+        padding-bottom: 10px;
     }
 
-    .menu-toggle:checked ~ .main-content {
-        overflow: hidden;
-        transform: translateX(-280px);
-        transition: transform 0.3s ease-in-out;
-    }
-    
-    .main-content {
-        transition: transform 0.3s ease-in-out;
+    .log-table {
+        min-width: 500px;
+        width: 100%;
     }
 }

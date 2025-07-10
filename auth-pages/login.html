@@ -6,14 +6,16 @@
     <title>MoodTree - Log-in</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=REM:ital,wght@0,100..900;1,100..900&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
+
         :root {
             --jade-green: #00A86B;
             --light-green-bg: #F0FFF4;
             --dark-text: #2D3748;
             --body-text: #4A5568;
             --white: #ffffff;
-            --header-font: 'Heavitas', sans-serif;
-            --body-font: 'Creato Display', sans-serif;
+            --header-font: 'REM', sans-serif;
+            --body-font: 'Urbanist', sans-serif;
             --border-color: #e2e8f0;
             --error-bg: #fed7d7;
             --error-border: #f56565;
@@ -101,16 +103,30 @@
             transition: all 0.3s ease;
             cursor: pointer;
             width: 100%;
+            font-family: var(--header-font);
         }
         .btn-primary {
             background-color: var(--jade-green);
             color: var(--white);
             box-shadow: 0 4px 14px 0 rgba(0, 168, 107, 0.39);
+            margin-bottom: 1rem;
         }
         .btn-primary:hover { background-color: #008a58; }
+
+        .btn-secondary {
+            background-color: #A5D6A7;
+            color: var(--dark-text);
+            box-shadow: 0 4px 14px 0 rgba(165, 214, 167, 0.39);
+        }
+        .btn-secondary:hover { background-color: #81C784; }
+
+
         .form-footer {
             text-align: center;
             margin-top: 1.5rem;
+        }
+        .form-footer p {
+            font-family: var(--body-font);
         }
         .notification {
             display: none;
@@ -121,6 +137,7 @@
             border-radius: 0.25rem;
             margin-top: 1.5rem;
             text-align: center;
+            font-family: var(--body-font);
         }
         .logo-img {
             display: block;
@@ -146,6 +163,7 @@
                 <input type="password" id="password" name="password" required>
             </div>
             <button type="submit" class="btn btn-primary small-caps">LOG IN</button>
+            <button type="button" id="admin-login-button" class="btn btn-secondary small-caps">LOG IN FOR ADMIN</button>
         </form>
         <div class="form-footer">
             <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
@@ -155,6 +173,7 @@
 
     <script>
         const loginForm = document.getElementById('login-form');
+        const adminLoginButton = document.getElementById('admin-login-button');
         const notification = document.getElementById('notification');
 
         loginForm.addEventListener('submit', function(event) {
@@ -163,21 +182,46 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            const storedData = localStorage.getItem('userData');
+            const storedUserData = localStorage.getItem('userData');
 
-            if (!storedData) {
-                notification.textContent = 'No account found. Please sign up first.';
+            if (!storedUserData) {
+                notification.textContent = 'No user account found with this email. Please sign up or try again.';
                 notification.style.display = 'block';
                 return;
             }
 
-            const userData = JSON.parse(storedData);
+            const userData = JSON.parse(storedUserData);
 
             if (email === userData.email && password === userData.password) {
                 localStorage.setItem('loggedInUser', userData.fullname);
+                localStorage.removeItem('adminLoggedIn');
                 window.location.href = `../user-dashboard/user-dashboard.html?username=${encodeURIComponent(userData.fullname)}`;
             } else {
-                notification.textContent = 'Invalid email or password.';
+                notification.textContent = 'Invalid email or password for user account.';
+                notification.style.display = 'block';
+            }
+        });
+
+        adminLoginButton.addEventListener('click', function() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            let adminUsers = JSON.parse(localStorage.getItem('adminUsers')) || [];
+
+            const admin = adminUsers.find(admin => admin.email === email && admin.password === password);
+
+            if (admin) {
+                localStorage.setItem('adminLoggedIn', admin.fullname);
+                localStorage.removeItem('loggedInUser');
+                notification.textContent = "Admin login successful! Redirecting to admin dashboard.";
+                notification.className = 'notification';
+                notification.style.display = 'block';
+                setTimeout(() => {
+                    window.location.href = '../admin-dashboard/admin-dashboard.html';
+                }, 2000);
+            } else {
+                notification.textContent = 'Invalid email or password for admin account.';
+                notification.className = 'notification error';
                 notification.style.display = 'block';
             }
         });

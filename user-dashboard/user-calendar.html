@@ -15,43 +15,46 @@
         .main-content {
             display: flex;
             flex-direction: column;
+            padding: 20px;
         }
         .calendar-container {
             width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
             background-color: #fff;
             padding: 20px;
-            border-radius: 12px;
+            border-radius: 15px;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            min-height: 0;
+            min-height: auto;
         }
         .calendar-header {
             background-color: #81C784;
             color: white;
-            padding: 10px 15px;
+            padding: 15px 20px;
             text-align: center;
             font-family: 'REM', sans-serif;
-            border-radius: 8px 8px 0 0;
+            border-radius: 12px 12px 0 0;
             flex-shrink: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         .calendar-header h2 {
-            font-size: 24px;
+            font-size: 28px;
             margin: 0;
         }
         .nav-button {
             background: transparent;
             border: 2px solid white;
             color: white;
-            font-size: 24px;
-            width: 40px;
-            height: 40px;
+            font-size: 28px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             cursor: pointer;
-            line-height: 36px;
+            line-height: 41px;
         }
         .weekdays {
             display: grid;
@@ -61,38 +64,40 @@
             flex-shrink: 0;
         }
         .weekdays div {
-            padding: 10px;
+            padding: 15px;
             text-align: center;
             font-weight: bold;
+            font-size: 16px;
         }
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             grid-auto-rows: 1fr;
-            gap: 5px;
+            gap: 8px;
             flex-grow: 1;
             overflow: hidden; 
         }
         .calendar-grid .day {
             background-color: #F5F5F5;
             border: 1px solid #E0E0E0;
-            padding: 5px;
+            padding: 8px;
             position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             overflow: hidden; 
+            min-height: 120px;
         }
         .day-number {
             position: absolute;
-            top: 5px;
-            left: 5px;
-            font-size: 14px;
+            top: 8px;
+            left: 8px;
+            font-size: 16px;
         }
         .calendar-tree {
-            width: 50px;
-            height: 70px;
+            width: 45px;
+            height: 60px;
             position: relative;
             display: flex;
             flex-direction: column;
@@ -101,8 +106,8 @@
             margin-bottom: 5px;
         }
         .calendar-tree .trunk {
-            height: 25px;
-            width: 10px;
+            height: 20px;
+            width: 8px;
             background-color: #8B4513;
             border-radius: 3px;
             position: absolute;
@@ -110,9 +115,9 @@
         }
         .calendar-tree .leaves {
             position: absolute;
-            bottom: 25px;
-            width: 40px;
-            height: 35px;
+            bottom: 20px;
+            width: 38px;
+            height: 32px;
             background-color: #4CAF50;
             border-radius: 50%;
             z-index: 1;
@@ -120,27 +125,27 @@
 
         .calendar-tree.type-pine .leaves {
             clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-            width: 45px;
-            height: 40px;
-            bottom: 25px;
+            width: 40px;
+            height: 35px;
+            bottom: 20px;
         }
         .calendar-tree.type-columnar .leaves {
             border-radius: 10px / 40px;
             width: 20px;
             height: 45px;
-            bottom: 25px;
+            bottom: 20px;
         }
         .calendar-tree.type-weeping .leaves {
             border-radius: 50% 50% 40% 40%;
             width: 45px;
             height: 30px;
-            bottom: 25px;
+            bottom: 20px;
         }
         .calendar-tree.type-rounded .leaves {
             border-radius: 50%;
             width: 40px;
             height: 40px;
-            bottom: 25px;
+            bottom: 20px;
         }
 
         .calendar-grid .day p {
@@ -166,10 +171,11 @@
             background-color: #b71c1c;
         }
 
+        .weekdays .short-day {
+            display: none;
+        }
+
         @media (max-width: 768px) {
-            .sidebar {
-                display: none;
-            }
             body {
                 flex-direction: column;
                 height: 100vh;
@@ -201,18 +207,6 @@
                 font-size: 16px;
             }
 
-            .hamburger-icon {
-                display: block;
-            }
-
-            .menu-toggle:checked + .hamburger-icon + .mobile-nav {
-                transform: translateX(0%);
-            }
-
-            .menu-toggle:checked ~ .main-content {
-                transform: translateX(280px);
-                overflow: hidden;
-            }
             .main-content {
                 transition: transform 0.3s ease-in-out;
             }
@@ -230,6 +224,14 @@
                 height: 30px;
                 font-size: 18px;
                 line-height: 28px;
+            }
+
+            .weekdays .full-day {
+                display: none;
+            }
+
+            .weekdays .short-day {
+                display: inline;
             }
 
             .weekdays div {
@@ -287,6 +289,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body id="calendar-page">
 
@@ -331,13 +334,34 @@
                 <button id="next-month" class="nav-button">&gt;</button>
             </div>
             <div class="weekdays">
-                <div>Sunday</div>
-                <div>Monday</div>
-                <div>Tuesday</div>
-                <div>Wednesday</div>
-                <div>Thursday</div>
-                <div>Friday</div>
-                <div>Saturday</div>
+                <div>
+                    <span class="full-day">Sunday</span>
+                    <span class="short-day">S</span>
+                </div>
+                <div>
+                    <span class="full-day">Monday</span>
+                    <span class="short-day">M</span>
+                </div>
+                <div>
+                    <span class="full-day">Tuesday</span>
+                    <span class="short-day">T</span>
+                </div>
+                <div>
+                    <span class="full-day">Wednesday</span>
+                    <span class="short-day">W</span>
+                </div>
+                <div>
+                    <span class="full-day">Thursday</span>
+                    <span class="short-day">T</span>
+                </div>
+                <div>
+                    <span class="full-day">Friday</span>
+                    <span class="short-day">F</span>
+                </div>
+                <div>
+                    <span class="full-day">Saturday</span>
+                    <span class="short-day">S</span>
+                </div>
             </div>
             <div id="calendar-grid" class="calendar-grid">
             </div>

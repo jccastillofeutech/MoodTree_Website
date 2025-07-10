@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Get username from URL or localStorage
     const urlParams = new URLSearchParams(window.location.search);
     let username = urlParams.get('username');
 
@@ -20,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
         username = localStorage.getItem('loggedInUser');
     }
 
-    // Display username in sidebar
     const usernameDisplay = document.getElementById('username-display');
     if (usernameDisplay && username) {
         usernameDisplay.textContent = username;
@@ -28,9 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
         usernameDisplay.textContent = 'Guest';
     }
 
-    // Setup logout button
     const logoutButton = document.getElementById('logout-button');
-    const mobileLogoutButton = document.getElementById('mobile-logout-button');
+    const mobileLogoutButton = document.getElementById('mobile-logout-button'); // Re-added mobile logout button
 
     const commonLogoutHandler = (event) => {
         event.preventDefault();
@@ -45,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (logoutButton) {
         logoutButton.addEventListener('click', commonLogoutHandler);
     }
-    if (mobileLogoutButton) {
+    if (mobileLogoutButton) { // Re-added event listener for mobileLogoutButton
         mobileLogoutButton.addEventListener('click', commonLogoutHandler);
     }
 
@@ -332,9 +329,11 @@ function loadDashboardData() {
         const workBar = document.getElementById('work-bar');
         const sleepBar = document.getElementById('sleep-bar');
 
-        workBar.style.height = `${(workHours / 24) * 100}%`;
+        const effectiveMaxHours = 27;
+
+        workBar.style.height = `${(workHours / effectiveMaxHours) * 100}%`;
         workBar.textContent = workHours;
-        sleepBar.style.height = `${(sleepHours / 24) * 100}%`;
+        sleepBar.style.height = `${(sleepHours / effectiveMaxHours) * 100}%`;
         sleepBar.textContent = sleepHours;
 
         document.getElementById('mood-display-color').style.backgroundColor = dataToDisplay.moodColor;
@@ -366,7 +365,6 @@ function loadDashboardData() {
     const month = today.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     
-    // Mood progress is calculated based on 'moodHistory', which is updated only after a tree is 'shoveled'.
     const history = JSON.parse(localStorage.getItem('moodHistory')) || {};
     const trackedDays = Object.keys(history).length; 
     
@@ -386,10 +384,13 @@ function setupSimulatorPage() {
     const progressBar = document.getElementById('growth-progress');
     const notificationOverlay = document.getElementById('notification-overlay');
     const redirectBtn = document.getElementById('redirect-log-mood');
+    const progressNotification = document.getElementById('progress-text-notification');
 
     let state = localStorage.getItem('treeState') || 'unplanted';
     let clicks = parseInt(localStorage.getItem('treeClicks')) || 0;
     const clicksNeeded = 80;
+    let notificationTimeout;
+    let growingNotificationShown = false;
 
     const dailyMood = JSON.parse(localStorage.getItem('dailyMood'));
     const todayKey = new Date().toISOString().split('T')[0];
@@ -402,29 +403,50 @@ function setupSimulatorPage() {
         fertilizeBtn.disabled = true;
         shovelBtn.disabled = true;
         
-        if(notificationOverlay) notificationOverlay.style.display = 'flex';
-        if(redirectBtn) redirectBtn.addEventListener('click', () => { window.location.href = 'log-mood.html'; });
-
-        if ((dailyMood && dailyMood.date !== todayKey) || (!dailyMood && state !== 'unplanted')) {
-             localStorage.removeItem('treeState');
-             localStorage.removeItem('treeClicks');
-             state = 'unplanted';
-             clicks = 0;
-        }
-        
         if (state === 'shoveled') {
             mound.style.display = 'none';
             treeContainer.style.display = 'none';
+            if (notificationOverlay) {
+                notificationOverlay.querySelector('h3').textContent = "All Done for Today!";
+                notificationOverlay.querySelector('p').textContent = "You've already grown and saved your tree. Come back tomorrow to grow a new one!";
+                notificationOverlay.querySelector('button').textContent = "View Calendar";
+                redirectBtn.addEventListener('click', () => { window.location.href = 'user-calendar.html'; });
+                notificationOverlay.style.display = 'flex';
+            }
+        } else {
+            if(notificationOverlay) notificationOverlay.style.display = 'flex';
+            if(redirectBtn) redirectBtn.addEventListener('click', () => { window.location.href = 'log-mood.html'; });
         }
-
-        updateUI(); 
         return; 
     }
     
     const moodColor = dailyMood.moodColor;
     const moodName = dailyMood.moodName;
-    const treeType = getTreeType(dailyMood.valence, dailyMood.arousal);
+    const treeType = getTreeType(dailyMood.valence, dailyDailymood.arousal);
     treeContainer.style.setProperty('--leaf-color', moodColor);
+
+    const quotes = {
+        pine: [
+            "The foolish man seeks happiness in the distance, the wise grows it under his feet. - James Oppenheim",
+            "Even if I knew that tomorrow the world would go to pieces, I would still plant my apple tree. - Martin Luther",
+            "Joy is the serious business of Heaven. - C.S. Lewis"
+        ],
+        columnar: [
+            "The best time to plant a tree was 20 years ago. The second best time is now. - Chinese Proverb",
+            "Notice that the stiffest tree is most easily cracked, while the bamboo or willow survives by bending with the wind. - Bruce Lee",
+            "Turn your wounds into wisdom. - Oprah Winfrey"
+        ],
+        weeping: [
+            "The clearest way into the Universe is through a forest wilderness. - John Muir",
+            "And into the forest I go, to lose my mind and find my soul. - John Muir",
+            "Even the darkest night will end and the sun will rise. - Victor Hugo"
+        ],
+        rounded: [
+            "A society grows great when old men plant trees in whose shade they shall never sit. - Greek Proverb",
+            "The creation of a thousand forests is in one acorn. - Ralph Waldo Emerson",
+            "Adopt the pace of nature: her secret is patience. - Ralph Waldo Emerson"
+        ]
+    };
 
 
     function updateUI() {
@@ -435,7 +457,6 @@ function setupSimulatorPage() {
 
         mound.style.display = 'none';
         treeContainer.style.display = 'none';
-        if(notificationOverlay) notificationOverlay.style.display = 'none';
 
         if (state === 'unplanted') {
         } else if (state === 'planted') {
@@ -459,6 +480,47 @@ function setupSimulatorPage() {
                 drawTree(clicks, treeType);
             }
         } 
+        
+        clearTimeout(notificationTimeout);
+        let notificationText = '';
+        let shouldShow = true;
+
+        switch(state) {
+            case 'unplanted':
+                notificationText = "Click the 'Plant' button to begin.";
+                break;
+            case 'planted':
+                notificationText = "Click the 'Water' button to water your seed.";
+                break;
+            case 'watered':
+                notificationText = "Click 'Fertilize' to enrich the soil.";
+                break;
+            case 'fertilized':
+            case 'growing':
+                if (!growingNotificationShown) {
+                    notificationText = "It's growing! Click the mound or tree to help it along.";
+                    growingNotificationShown = true;
+                } else {
+                    shouldShow = false;
+                }
+                break;
+            case 'mature':
+                notificationText = "Your tree is fully grown! Click 'Shovel' to save your tree.";
+                break;
+        }
+
+        if (shouldShow && notificationText) {
+            progressNotification.textContent = notificationText;
+            progressNotification.style.opacity = '1';
+            if (state === 'fertilized' || state === 'growing') {
+                notificationTimeout = setTimeout(() => {
+                    progressNotification.style.opacity = '0';
+                }, 2500);
+            }
+        } else if (!shouldShow) {
+             progressNotification.style.opacity = '0';
+        }
+
 
         const progress = Math.min((clicks / clicksNeeded) * 100, 100);
         progressBar.style.width = `${progress}%`;
@@ -483,7 +545,7 @@ function setupSimulatorPage() {
     });
 
     treeContainer.addEventListener('click', () => {
-        if (state === 'growing' || state === 'mature') {
+        if (state === 'growing') {
             clicks++;
             if (clicks >= clicksNeeded) {
                 state = 'mature';
@@ -496,37 +558,19 @@ function setupSimulatorPage() {
         if (state === 'mature') {
             const todayKey = new Date().toISOString().split('T')[0];
             const history = JSON.parse(localStorage.getItem('moodHistory')) || {};
-            history[todayKey] = { moodName, moodColor, treeType };
+            
+            // Get a random quote based on the tree type
+            const randomQuote = quotes[treeType][Math.floor(Math.random() * quotes[treeType].length)];
+
+            history[todayKey] = { moodName, moodColor, treeType, note: dailyMood.note, quote: randomQuote }; // Save the note and the quote
             localStorage.setItem('moodHistory', JSON.stringify(history));
             
             localStorage.removeItem('tempMood');
             localStorage.removeItem('treeClicks');
             localStorage.setItem('treeState', 'shoveled');
+            state = 'shoveled';
 
-            const showMessage = (msg, callback) => {
-                const overlay = document.createElement('div');
-                overlay.style.cssText = `
-                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                    background: rgba(0,0,0,0.6); z-index: 1000;
-                    display: flex; align-items: center; justify-content: center;
-                `;
-                const box = document.createElement('div');
-                box.style.cssText = `
-                    background: #fff; padding: 20px; border-radius: 8px; text-align: center;
-                    box-shadow: 0 4px 8px rgba(0,0,0,0.2); max-width: 300px;
-                `;
-                box.innerHTML = `<p>${msg}</p><button style="margin-top: 10px; padding: 8px 15px; background-color: #81C784; color: white; border: none; border-radius: 5px; cursor: pointer;">OK</button>`;
-                overlay.appendChild(box);
-                document.body.appendChild(overlay);
-                box.querySelector('button').onclick = () => {
-                    document.body.removeChild(overlay);
-                    if (callback) callback();
-                };
-            };
-
-            showMessage('Tree Shoveled and recorded in your calendar! Your mood for today is now considered logged.', () => {
-                window.location.href = 'user-calendar.html'; 
-            });
+            window.location.href = `user-calendar.html?showDialog=true&date=${todayKey}`;
         }
     });
 
@@ -535,14 +579,7 @@ function setupSimulatorPage() {
 
 function drawTree(clicks, treeType) {
     const tree = document.getElementById('tree-container');
-    const trunk = tree.querySelector('.trunk');
-    const canopy = tree.querySelector('.canopy');
-
     tree.className = ''; 
-    trunk.removeAttribute('style'); 
-    canopy.removeAttribute('style'); 
-    canopy.querySelectorAll('div').forEach(leaf => leaf.removeAttribute('style')); 
-
 
     if (clicks >= 20 && clicks < 40) {
         tree.classList.add('stage-1');
@@ -569,8 +606,201 @@ function setupCalendarPage() {
     const monthTitle = document.getElementById('month-name');
     const prevMonthBtn = document.getElementById('prev-month');
     const nextMonthBtn = document.getElementById('next-month');
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const showDialogOnLoad = urlParams.get('showDialog') === 'true';
+    const dialogDateKey = urlParams.get('date');
 
     let currentDate = new Date();
+
+   
+    const quotes = {
+        pine: [
+            "The foolish man seeks happiness in the distance, the wise grows it under his feet. - James Oppenheim",
+            "Even if I knew that tomorrow the world would go to pieces, I would still plant my apple tree. - Martin Luther",
+            "Joy is the serious business of Heaven. - C.S. Lewis"
+        ],
+        columnar: [
+            "The best time to plant a tree was 20 years ago. The second best time is now. - Chinese Proverb",
+            "Notice that the stiffest tree is most easily cracked, while the bamboo or willow survives by bending with the wind. - Bruce Lee",
+            "Turn your wounds into wisdom. - Oprah Winfrey"
+        ],
+        weeping: [
+            "The clearest way into the Universe is through a forest wilderness. - John Muir",
+            "And into the forest I go, to lose my mind and find my soul. - John Muir",
+            "Even the darkest night will end and the sun will rise. - Victor Hugo"
+        ],
+        rounded: [
+            "A society grows great when old men plant trees in whose shade they shall never sit. - Greek Proverb",
+            "The creation of a thousand forests is in one acorn. - Ralph Waldo Emerson",
+            "Adopt the pace of nature: her secret is patience. - Ralph Waldo Emerson"
+        ]
+    };
+
+    function showShovelDialog(dateKey) {
+        const history = JSON.parse(localStorage.getItem('moodHistory')) || {};
+        const entry = history[dateKey];
+        if (!entry) return;
+
+        const { moodColor, treeType, quote } = entry; 
+
+        const randomQuote = quote || quotes[treeType][Math.floor(Math.random() * quotes[treeType].length)]; 
+
+        const shovelOverlay = document.createElement('div');
+        shovelOverlay.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 1000;
+            display: flex; align-items: center; justify-content: center;
+        `;
+
+        const box = document.createElement('div');
+        box.style.cssText = `
+            background: #fff; padding: 30px; border-radius: 12px; text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); max-width: 400px;
+            animation: pop 0.4s ease-out forwards;
+        `;
+
+        const treeDiv = document.createElement('div');
+        treeDiv.className = `calendar-tree type-${treeType}`;
+        treeDiv.style.cssText = `
+            width: 100px; height: 120px; position: relative; display: inline-flex;
+            flex-direction: column; align-items: center; justify-content: flex-end; margin-bottom: 15px;
+        `;
+        const trunk = document.createElement('div');
+        trunk.className = 'trunk';
+        trunk.style.cssText = `height: 40px; width: 12px; background-color: #8B4513; border-radius: 4px; position: absolute; bottom: 0;`;
+        const leaves = document.createElement('div');
+        leaves.className = 'leaves';
+        leaves.style.backgroundColor = moodColor;
+        leaves.style.position = 'absolute';
+        leaves.style.bottom = '40px';
+
+        if (treeType === 'pine') {
+            leaves.style.clipPath = 'polygon(50% 0%, 100% 100%, 0% 100%)';
+            leaves.style.width = '80px'; leaves.style.height = '70px';
+        } else if (treeType === 'columnar') {
+            leaves.style.borderRadius = '10px / 40px';
+            leaves.style.width = '40px'; leaves.style.height = '90px';
+        } else if (treeType === 'weeping') {
+            leaves.style.borderRadius = '50% 50% 40% 40%';
+            leaves.style.width = '90px'; leaves.style.height = '60px';
+        } else {
+            leaves.style.borderRadius = '50%';
+            leaves.style.width = '80px'; leaves.style.height = '80px';
+        }
+
+        treeDiv.appendChild(trunk);
+        treeDiv.appendChild(leaves);
+
+        box.innerHTML = `
+            <h3>Your tree has been planted in the calendar!</h3>
+            <div id="dialog-tree-container" style="width: 100%; height: 150px; display: flex; justify-content: center; align-items: flex-end; position: relative;"></div>
+            <p class="quote" style="font-style: italic; color: #666; max-width: 90%; margin: 15px auto; text-align: center;">"${randomQuote}"</p>
+            <button id="confirm-shovel" style="padding: 12px 25px; background-color: #81C784; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; transition: background-color 0.2s;">Great!</button>
+        `;
+        box.querySelector('#confirm-shovel').onmouseover = function() { this.style.backgroundColor = '#66BB6A'; };
+        box.querySelector('#confirm-shovel').onmouseout = function() { this.style.backgroundColor = '#81C784'; };
+
+
+        box.querySelector('#dialog-tree-container').appendChild(treeDiv);
+        shovelOverlay.appendChild(box);
+        document.body.appendChild(shovelOverlay);
+
+        const styleSheet = document.createElement("style");
+        styleSheet.type = "text/css";
+        styleSheet.innerText = `@keyframes pop { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }`;
+        document.head.appendChild(styleSheet);
+
+        box.querySelector('#confirm-shovel').onclick = () => {
+            document.body.removeChild(shovelOverlay);
+            document.head.removeChild(styleSheet);
+        };
+    }
+
+    function showCalendarDayDetailsDialog(dateKey) {
+        const history = JSON.parse(localStorage.getItem('moodHistory')) || {};
+        const entry = history[dateKey];
+        if (!entry) return;
+
+        const { moodName, moodColor, treeType, quote } = entry; 
+
+        const dialogOverlay = document.createElement('div');
+        dialogOverlay.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 1000;
+            display: flex; align-items: center; justify-content: center;
+        `;
+
+        const box = document.createElement('div');
+        box.style.cssText = `
+            background: #fff; padding: 30px; border-radius: 12px; text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); max-width: 400px;
+            animation: pop 0.4s ease-out forwards;
+        `;
+
+        const treeDiv = document.createElement('div');
+        treeDiv.className = `calendar-tree type-${treeType}`;
+        treeDiv.style.cssText = `
+            width: 100px; height: 120px; position: relative; display: inline-flex;
+            flex-direction: column; align-items: center; justify-content: flex-end; margin-bottom: 15px;
+        `;
+        const trunk = document.createElement('div');
+        trunk.className = 'trunk';
+        trunk.style.cssText = `height: 40px; width: 12px; background-color: #8B4513; border-radius: 4px; position: absolute; bottom: 0;`;
+        const leaves = document.createElement('div');
+        leaves.className = 'leaves';
+        leaves.style.backgroundColor = moodColor;
+        leaves.style.position = 'absolute';
+        leaves.style.bottom = '40px';
+
+        if (treeType === 'pine') {
+            leaves.style.clipPath = 'polygon(50% 0%, 100% 100%, 0% 100%)';
+            leaves.style.width = '80px'; leaves.style.height = '70px';
+        } else if (treeType === 'columnar') {
+            leaves.style.borderRadius = '10px / 40px';
+            leaves.style.width = '40px'; leaves.style.height = '90px';
+        } else {
+            leaves.style.borderRadius = '50%';
+            leaves.style.width = '80px'; leaves.style.height = '80px';
+        }
+        if (treeType === 'weeping') {
+            leaves.style.borderRadius = '50% 50% 40% 40%';
+            leaves.style.width = '90px'; leaves.style.height = '60px';
+        }
+
+
+        treeDiv.appendChild(trunk);
+        treeDiv.appendChild(leaves);
+
+        const displayDate = new Date(dateKey + 'T00:00:00').toLocaleDateString('en-US', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        box.innerHTML = `
+            <h3>Your Day on ${displayDate}</h3>
+            <div id="dialog-tree-container" style="width: 100%; height: 150px; display: flex; justify-content: center; align-items: flex-end; position: relative;"></div>
+            <p style="font-weight: bold; margin-bottom: 5px;">Mood: <span style="color: ${moodColor};">${moodName}</span></p>
+            <p style="font-style: italic; color: #666; margin-top: 5px;">"${quote || 'No quote available.'}"</p>
+            <button id="close-dialog" style="padding: 12px 25px; background-color: #81C784; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 20px; transition: background-color 0.2s;">Close</button>
+        `;
+        box.querySelector('#close-dialog').onmouseover = function() { this.style.backgroundColor = '#66BB6A'; };
+        box.querySelector('#close-dialog').onmouseout = function() { this.style.backgroundColor = '#81C784'; };
+
+        box.querySelector('#dialog-tree-container').appendChild(treeDiv);
+        dialogOverlay.appendChild(box);
+        document.body.appendChild(dialogOverlay);
+
+        const styleSheet = document.createElement("style");
+        styleSheet.type = "text/css";
+        styleSheet.innerText = `@keyframes pop { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }`;
+        document.head.appendChild(styleSheet);
+
+        box.querySelector('#close-dialog').onclick = () => {
+            document.body.removeChild(dialogOverlay);
+            document.head.removeChild(styleSheet);
+        };
+    }
+
 
     function renderCalendar(year, month) {
         calendarGrid.innerHTML = '';
@@ -589,8 +819,9 @@ function setupCalendarPage() {
         for (let day = 1; day <= daysInMonth; day++) {
             const daySquare = document.createElement('div');
             daySquare.className = 'day';
-            daySquare.innerHTML = `<span class="day-number">${day}</span>`;
             const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            daySquare.setAttribute('data-date-key', dateKey);
+            daySquare.innerHTML = `<span class="day-number">${day}</span>`;
 
             if (history[dateKey]) {
                 const entry = history[dateKey];
@@ -611,8 +842,21 @@ function setupCalendarPage() {
                 
                 daySquare.appendChild(treeDiv);
                 daySquare.appendChild(moodName);
+
+                daySquare.addEventListener('click', () => showCalendarDayDetailsDialog(dateKey));
             }
             calendarGrid.appendChild(daySquare);
+        }
+
+        if (showDialogOnLoad && dialogDateKey) {
+            const dateParts = dialogDateKey.split('-').map(Number);
+            if (dateParts[0] === year && (dateParts[1] - 1) === month) {
+                 const dayElement = calendarGrid.querySelector(`[data-date-key="${dialogDateKey}"]`);
+                 if (dayElement) {
+                     showShovelDialog(dialogDateKey);
+                     window.history.replaceState({}, document.title, window.location.pathname);
+                 }
+            }
         }
     }
 

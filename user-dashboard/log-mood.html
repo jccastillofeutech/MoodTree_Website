@@ -7,6 +7,34 @@
     <link rel="stylesheet" href="css-styling/user-menu-style.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=REM:ital,wght@0,100..900;1,100..900&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
+        body {
+            display: flex;
+            font-family: 'Urbanist', sans-serif;
+            background-color: #FAFAFA;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-family: 'REM', sans-serif;
+            font-size: 36px;
+            margin: 0;
+        }
+        .header .date {
+            font-size: 18px;
+            color: #757575;
+        }
         .log-mood-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -26,6 +54,7 @@
             display: flex;
             flex-direction: column;
             flex-grow: 1;
+            background-color: #fff;
         }
         .notes-header {
             background: #81C784;
@@ -45,6 +74,7 @@
             font-size: 16px;
             resize: none;
             outline: none;
+            background-color: transparent;
         }
         #char-counter {
             text-align: right;
@@ -60,12 +90,26 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            background-color: #fff;
         }
         .slider-item {
             display: flex;
             align-items: center;
             gap: 20px;
         }
+        
+        .slider-content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .mood-label {
+            text-align: center;
+            font-size: 14px;
+            color: #333;
+        }
+
         .icon-container {
             width: 60px;
             flex-shrink: 0;
@@ -106,6 +150,7 @@
             background-color: #fff;
             border: 3px solid;
             cursor: pointer;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
         }
          .lever::-moz-range-thumb {
             width: 40px;
@@ -114,22 +159,29 @@
             background-color: #fff;
             border: 3px solid;
             cursor: pointer;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
         }
         #happiness-slider { background: linear-gradient(90deg, #E8F5E9, #4CAF50); }
         #sadness-slider { background: linear-gradient(90deg, #FFFDE7, #FFC107); }
         #anger-slider { background: linear-gradient(90deg, #FFEBEE, #F44336); }
         #calmness-slider { background: linear-gradient(90deg, #E3F2FD, #2196F3); }
-        #work-slider, #sleep-slider { background: #E0E0E0; }
+        #work-slider { background: linear-gradient(90deg, #E0F2F1, #2E7D32); }
+        #sleep-slider { background: linear-gradient(90deg, #F1F8E9, #689F38); }
+        
         #happiness-slider::-webkit-slider-thumb { border-color: #4CAF50; }
         #sadness-slider::-webkit-slider-thumb { border-color: #FFC107; }
         #anger-slider::-webkit-slider-thumb { border-color: #F44336; }
         #calmness-slider::-webkit-slider-thumb { border-color: #2196F3; }
-        #work-slider::-webkit-slider-thumb, #sleep-slider::-webkit-slider-thumb { border-color: #8D8D8D; }
+        #work-slider::-webkit-slider-thumb { border-color: #2E7D32; }
+        #sleep-slider::-webkit-slider-thumb { border-color: #689F38; }
+
         #happiness-slider::-moz-range-thumb { border-color: #4CAF50; }
         #sadness-slider::-moz-range-thumb { border-color: #FFC107; }
         #anger-slider::-moz-range-thumb { border-color: #F44336; }
         #calmness-slider::-moz-range-thumb { border-color: #2196F3; }
-        #work-slider::-moz-range-thumb, #sleep-slider::-moz-range-thumb { border-color: #8D8D8D; }
+        #work-slider::-moz-range-thumb { border-color: #2E7D32; }
+        #sleep-slider::-moz-range-thumb { border-color: #689F38; }
+        
         .progress-circle {
             width: 70px;
             height: 70px;
@@ -161,6 +213,7 @@
              border-radius: 12px;
              padding: 20px;
              text-align: center;
+             background-color: #fff;
         }
         .mood-color-box {
             width: 100px;
@@ -187,6 +240,11 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .action-buttons button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
         #save-mood {
             background-color: #81C784;
@@ -215,9 +273,6 @@
         }
 
         @media (max-width: 768px) {
-            .sidebar {
-                display: none;
-            }
             body {
                 flex-direction: column;
                 height: 100vh;
@@ -230,11 +285,6 @@
                 overflow-y: auto;
             }
             .header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                width: 100%;
-                margin-bottom: 20px;
                 position: sticky;
                 top: 0;
                 background-color: #FFF;
@@ -246,21 +296,9 @@
                 font-size: 28px;
             }
             .header .date {
-                font-size: 16px;
+                display: none;
             }
 
-            .hamburger-icon {
-                display: block;
-            }
-
-            .menu-toggle:checked + .hamburger-icon + .mobile-nav {
-                transform: translateX(0%);
-            }
-
-            .menu-toggle:checked ~ .main-content {
-                transform: translateX(280px);
-                overflow: hidden;
-            }
             .main-content {
                 transition: transform 0.3s ease-in-out;
             }
@@ -291,11 +329,22 @@
                 padding: 15px;
                 gap: 15px;
             }
-
+            
             .slider-item {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: center;
                 gap: 10px;
+            }
+            .slider-item .slider-wrapper {
+                width: 100%;
+            }
+            .slider-item label {
+                width: auto;
+                font-size: 14px;
+            }
+
+            .slider-content-wrapper {
+                width: 100%;
             }
 
             .icon-container {
@@ -305,11 +354,6 @@
             .emotion-icon {
                 width: 50px;
                 height: 50px;
-            }
-
-            .slider-item label {
-                width: auto;
-                font-size: 14px;
             }
 
             .lever {
@@ -358,6 +402,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body id="log-mood-page">
 
@@ -418,37 +463,49 @@
                     <p>What feeling did you have today?</p>
                     <div class="slider-item">
                         <div class="icon-container">
-                             <img src="images/emojis/happy.png" alt="Happy" class="emotion-icon">
+                             <img src="images/emojis/happy.png" alt="Happy" class="emotion-icon" onerror="this.style.display='none'">
                         </div>
-                        <div class="slider-wrapper">
-                            <input type="range" min="1" max="10" value="5" class="lever" id="happiness-slider">
+                        <div class="slider-content-wrapper">
+                            <div class="slider-wrapper">
+                                <input type="range" min="1" max="10" value="5" class="lever" id="happiness-slider">
+                            </div>
+                            <span class="mood-label">Happy</span>
                         </div>
                         <div class="progress-circle" id="happiness-pie"><span>5</span></div>
                     </div>
                     <div class="slider-item">
                          <div class="icon-container">
-                             <img src="images/emojis/sad.png" alt="Sad" class="emotion-icon">
+                             <img src="images/emojis/sad.png" alt="Sad" class="emotion-icon" onerror="this.style.display='none'">
                         </div>
-                         <div class="slider-wrapper">
-                            <input type="range" min="1" max="10" value="5" class="lever" id="sadness-slider">
+                        <div class="slider-content-wrapper">
+                            <div class="slider-wrapper">
+                                <input type="range" min="1" max="10" value="5" class="lever" id="sadness-slider">
+                            </div>
+                            <span class="mood-label">Sad</span>
                         </div>
                         <div class="progress-circle" id="sadness-pie"><span>5</span></div>
                     </div>
                     <div class="slider-item">
                          <div class="icon-container">
-                             <img src="images/emojis/angry.png" alt="Angry" class="emotion-icon">
+                             <img src="images/emojis/angry.png" alt="Angry" class="emotion-icon" onerror="this.style.display='none'">
                         </div>
-                         <div class="slider-wrapper">
-                            <input type="range" min="1" max="10" value="5" class="lever" id="anger-slider">
+                         <div class="slider-content-wrapper">
+                             <div class="slider-wrapper">
+                                <input type="range" min="1" max="10" value="5" class="lever" id="anger-slider">
+                            </div>
+                            <span class="mood-label">Angry</span>
                         </div>
                         <div class="progress-circle" id="anger-pie"><span>5</span></div>
                     </div>
                     <div class="slider-item">
                         <div class="icon-container">
-                             <img src="images/emojis/calm.png" alt="Calm" class="emotion-icon">
+                             <img src="images/emojis/calm.png" alt="Calm" class="emotion-icon" onerror="this.style.display='none'">
                         </div>
-                         <div class="slider-wrapper">
-                            <input type="range" min="1" max="10" value="5" class="lever" id="calmness-slider">
+                         <div class="slider-content-wrapper">
+                            <div class="slider-wrapper">
+                                <input type="range" min="1" max="10" value="5" class="lever" id="calmness-slider">
+                            </div>
+                            <span class="mood-label">Calm</span>
                         </div>
                         <div class="progress-circle" id="calmness-pie"><span>5</span></div>
                     </div>
