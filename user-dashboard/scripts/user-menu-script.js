@@ -26,8 +26,15 @@ document.addEventListener('DOMContentLoaded', () => {
         usernameDisplay.textContent = 'Guest';
     }
 
+    const mobileUsernameDisplay = document.getElementById('mobile-username-display');
+    if (mobileUsernameDisplay && username) {
+        mobileUsernameDisplay.textContent = username;
+    } else if (mobileUsernameDisplay) {
+        mobileUsernameDisplay.textContent = 'Guest';
+    }
+
     const logoutButton = document.getElementById('logout-button');
-    const mobileLogoutButton = document.getElementById('mobile-logout-button'); // Re-added mobile logout button
+    const mobileLogoutButton = document.getElementById('mobile-logout-button');
 
     const commonLogoutHandler = (event) => {
         event.preventDefault();
@@ -42,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (logoutButton) {
         logoutButton.addEventListener('click', commonLogoutHandler);
     }
-    if (mobileLogoutButton) { // Re-added event listener for mobileLogoutButton
+    if (mobileLogoutButton) {
         mobileLogoutButton.addEventListener('click', commonLogoutHandler);
     }
 
@@ -86,9 +93,6 @@ function setupLogMoodPage() {
         sleep: '#689F38'
     };
 
-    const moodColorBox = document.getElementById('mood-color-box');
-    const moodNameDisplay = document.getElementById('mood-name');
-    const saveButton = document.getElementById('save-mood');
     const createSeedButton = document.getElementById('create-seed');
     const notesArea = document.getElementById('notes-area');
     const charCounter = document.getElementById('char-counter');
@@ -122,7 +126,7 @@ function setupLogMoodPage() {
         return closestMood || { name: 'Neutral', color: '#BDBDBD' };
     }
 
-    function updateMood() {
+    function calculateMood() {
         const pleasant = (parseInt(sliders.happiness.value) - 1) + (parseInt(sliders.calmness.value) - 1);
         const unpleasant = (parseInt(sliders.sadness.value) - 1) + (parseInt(sliders.anger.value) - 1);
         const highEnergy = (parseInt(sliders.happiness.value) - 1) + (parseInt(sliders.anger.value) - 1);
@@ -131,9 +135,7 @@ function setupLogMoodPage() {
         let valence = (pleasant - unpleasant) / 18;
         let arousal = (highEnergy - lowEnergy) / 18;
 
-        const { color, name } = getMoodFromCircumplex(valence, arousal);
-        moodColorBox.style.backgroundColor = color;
-        moodNameDisplay.textContent = name;
+        return getMoodFromCircumplex(valence, arousal);
     }
 
     function updatePie(slider, pie, key) {
@@ -156,102 +158,96 @@ function setupLogMoodPage() {
     for (const key in sliders) {
         sliders[key].addEventListener('input', () => {
             updatePie(sliders[key], pies[key], key);
-            if (!key.includes('work') && !key.includes('sleep')) {
-                updateMood();
-            }
         });
     }
     
     notesArea.addEventListener('input', updateCharCounter);
 
-    saveButton.addEventListener('click', () => {
-        const showMessage = (msg) => {
-            const overlay = document.createElement('div');
-            overlay.style.cssText = `
-                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                background: rgba(0,0,0,0.6); z-index: 1000;
-                display: flex; align-items: center; justify-content: center;
-            `;
-            const box = document.createElement('div');
-            box.style.cssText = `
-                background: #fff; padding: 20px; border-radius: 8px; text-align: center;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.2); max-width: 300px;
-            `;
-            box.innerHTML = `<p>${msg}</p><button style="margin-top: 10px; padding: 8px 15px; background-color: #81C784; color: white; border: none; border-radius: 5px; cursor: pointer;">OK</button>`;
-            overlay.appendChild(box);
-            document.body.appendChild(overlay);
-            box.querySelector('button').onclick = () => document.body.removeChild(overlay);
-        };
-
-        const moodData = {
-            happiness: sliders.happiness.value, sadness: sliders.sadness.value,
-            anger: sliders.anger.value, calmness: sliders.calmness.value,
-            work: sliders.work.value, sleep: sliders.sleep.value,
-            moodColor: moodColorBox.style.backgroundColor,
-            moodName: moodNameDisplay.textContent,
-            note: document.getElementById('notes-area').value,
-            date: new Date().toISOString().split('T')[0]
-        };
-        localStorage.setItem('tempMood', JSON.stringify(moodData));
-        showMessage('Your progress has been saved temporarily.');
-    });
-
     createSeedButton.addEventListener('click', () => {
-        const pleasant = (parseInt(sliders.happiness.value) - 1) + (parseInt(sliders.calmness.value) - 1);
-        const unpleasant = (parseInt(sliders.sadness.value) - 1) + (parseInt(sliders.anger.value) - 1);
-        const highEnergy = (parseInt(sliders.happiness.value) - 1) + (parseInt(sliders.anger.value) - 1);
-        const lowEnergy = (parseInt(sliders.sadness.value) - 1) + (parseInt(sliders.calmness.value) - 1);
-        
-        let valence = (pleasant - unpleasant) / 18;
-        let arousal = (highEnergy - lowEnergy) / 18;
+        const { color: moodColor, name: moodName, valence, arousal } = calculateMood();
+
+        const today = new Date(); 
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const todayKey = `${year}-${month}-${day}`;
 
         const moodData = {
             happiness: sliders.happiness.value, sadness: sliders.sadness.value,
             anger: sliders.anger.value, calmness: sliders.calmness.value,
             work: sliders.work.value, sleep: sliders.sleep.value,
-            moodColor: moodColorBox.style.backgroundColor,
-            moodName: moodNameDisplay.textContent,
+            moodColor: moodColor,
+            moodName: moodName,
             note: document.getElementById('notes-area').value,
             valence: valence,
             arousal: arousal,
             status: 'created',
-            date: new Date().toISOString().split('T')[0]
+            date: todayKey
         };
         localStorage.setItem('dailyMood', JSON.stringify(moodData));
         localStorage.removeItem('tempMood');
         
         Object.values(sliders).forEach(s => s.disabled = true);
         createSeedButton.disabled = true;
-        saveButton.disabled = true;
         notesArea.disabled = true;
 
-        const showMessage = (msg, callback) => {
-            const overlay = document.createElement('div');
-            overlay.style.cssText = `
-                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                background: rgba(0,0,0,0.6); z-index: 1000;
-                display: flex; align-items: center; justify-content: center;
-            `;
-            const box = document.createElement('div');
-            box.style.cssText = `
-                background: #fff; padding: 20px; border-radius: 8px; text-align: center;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.2); max-width: 300px;
-            `;
-            box.innerHTML = `<p>${msg}</p><button style="margin-top: 10px; padding: 8px 15px; background-color: #81C784; color: white; border: none; border-radius: 5px; cursor: pointer;">OK</button>`;
-            overlay.appendChild(box);
-            document.body.appendChild(overlay);
-            box.querySelector('button').onclick = () => {
-                document.body.removeChild(overlay);
-                if (callback) callback();
-            };
-        };
-        showMessage('Seed Created! Let\'s go to the simulator to grow your tree.', () => {
+        let reflectionMessage = "";
+        if (moodName === 'Happy' || moodName === 'Delighted' || moodName === 'Glad' || moodName === 'Pleased' || moodName === 'Amused' || moodName === 'Excited' || moodName === 'Astonished') {
+            reflectionMessage = "It's wonderful to see you feeling positive! Your seed will thrive with this energy.";
+        } else if (moodName === 'Sad' || moodName === 'Depressed' || moodName === 'Gloomy' || moodName === 'Miserable') {
+            reflectionMessage = "It's okay to feel this way. Your seed is resilient and will grow with care.";
+        } else if (moodName === 'Angry' || moodName === 'Frustrated' || moodName === 'Annoyed' || moodName === 'Tense' || moodName === 'Alarmed') {
+            reflectionMessage = "Acknowledging your feelings is the first step. Let's channel this energy into growth.";
+        } else if (moodName === 'Calm' || moodName === 'Serene' || moodName === 'At Ease' || moodName === 'Content') {
+            reflectionMessage = "A calm mind brings strength. Your seed will grow peacefully.";
+        } else if (moodName === 'Tired' || moodName === 'Fatigued' || moodName === 'Lethargic' || moodName === 'Sleepy') {
+            reflectionMessage = "Rest is important for growth. Your seed needs time and nurturing.";
+        } else {
+            reflectionMessage = "Reflect on what this mood means for you. Your seed represents your journey.";
+        }
+
+
+        const moodDialogOverlay = document.createElement('div');
+        moodDialogOverlay.className = 'mood-dialog-overlay';
+        moodDialogOverlay.innerHTML = `
+            <div class="mood-dialog-box">
+                <h3>Your Mood Seed for Today!</h3>
+                <div class="mood-dialog-seed" style="background-color: ${moodColor};"></div>
+                <p class="mood-dialog-message">${reflectionMessage}</p>
+                <button class="mood-dialog-button" id="mood-dialog-ok-button">OK</button>
+            </div>
+        `;
+        document.body.appendChild(moodDialogOverlay);
+
+        document.getElementById('mood-dialog-ok-button').addEventListener('click', () => {
+            document.body.removeChild(moodDialogOverlay);
             window.location.href = 'tree-simulator.html';
         });
+
+        const styleSheet = document.createElement("style");
+        styleSheet.type = "text/css";
+        styleSheet.innerText = `
+            .mood-dialog-seed {
+                width: 100px;
+                height: 60px;
+                background-color: var(--seed-color, #BDBDBD);
+                border-radius: 50px / 30px;
+                margin-bottom: 15px;
+                transition: background-color 0.3s ease;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            }
+        `;
+        document.head.appendChild(styleSheet);
+        moodDialogOverlay.querySelector('.mood-dialog-seed').style.setProperty('--seed-color', moodColor);
     });
     
     function loadState() {
-        const todayKey = new Date().toISOString().split('T')[0];
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const todayKey = `${year}-${month}-${day}`;
+
         const dailyMood = JSON.parse(localStorage.getItem('dailyMood'));
         let dataToLoad = null;
 
@@ -259,7 +255,7 @@ function setupLogMoodPage() {
             localStorage.removeItem('dailyMood');
         }
         const tempMood = JSON.parse(localStorage.getItem('tempMood'));
-        if (tempMood && tempMood.date !== todayKey) {
+        if (tempMood && tempMood.date !== todayKey) { 
             localStorage.removeItem('tempMood');
         }
 
@@ -270,18 +266,15 @@ function setupLogMoodPage() {
             dataToLoad = currentDailyMood;
             Object.values(sliders).forEach(s => s.disabled = true);
             createSeedButton.disabled = true;
-            saveButton.disabled = true;
             notesArea.disabled = true;
         } else if (currentTempMood && currentTempMood.date === todayKey) {
             dataToLoad = currentTempMood;
             Object.values(sliders).forEach(s => s.disabled = false);
             createSeedButton.disabled = false;
-            saveButton.disabled = false;
             notesArea.disabled = false;
         } else {
             Object.values(sliders).forEach(s => s.disabled = false);
             createSeedButton.disabled = false;
-            saveButton.disabled = false;
             notesArea.disabled = false;
             Object.keys(sliders).forEach(key => {
                 const defaultVal = key === 'work' || key === 'sleep' ? 8 : 5;
@@ -300,7 +293,6 @@ function setupLogMoodPage() {
         }
         
         Object.keys(sliders).forEach(key => updatePie(sliders[key], pies[key], key));
-        updateMood();
         updateCharCounter();
     }
     
@@ -309,7 +301,12 @@ function setupLogMoodPage() {
 
 
 function loadDashboardData() {
-    const todayKey = new Date().toISOString().split('T')[0];
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const todayKey = `${year}-${month}-${day}`;
+
     let dataToDisplay = JSON.parse(localStorage.getItem('dailyMood'));
 
     if (!dataToDisplay || dataToDisplay.date !== todayKey) {
@@ -353,17 +350,13 @@ function loadDashboardData() {
         sleepBar.textContent = '0';
         document.getElementById('mood-display-color').style.backgroundColor = '#DDD';
         document.getElementById('mood-display-name').textContent = 'NOT LOGGED';
-        document.getElementById('notes-display').textContent = 'No note added.';
         document.getElementById('happiness-level').style.height = '0%';
         document.getElementById('sadness-level').style.height = '0%';
         document.getElementById('anger-level').style.height = '0%';
         document.getElementById('calmness-level').style.height = '0%';
     }
         
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInMonth = new Date(year, today.getMonth() + 1, 0).getDate();
     
     const history = JSON.parse(localStorage.getItem('moodHistory')) || {};
     const trackedDays = Object.keys(history).length; 
@@ -386,14 +379,31 @@ function setupSimulatorPage() {
     const redirectBtn = document.getElementById('redirect-log-mood');
     const progressNotification = document.getElementById('progress-text-notification');
 
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const todayKey = `${year}-${month}-${day}`;
+
+    let dailyMood = JSON.parse(localStorage.getItem('dailyMood'));
+    let tempMood = JSON.parse(localStorage.getItem('tempMood'));
+
+    if ((dailyMood && dailyMood.date !== todayKey) || (tempMood && tempMood.date !== todayKey)) {
+        localStorage.removeItem('dailyMood');
+        localStorage.removeItem('tempMood');
+        localStorage.removeItem('treeState');
+        localStorage.removeItem('treeClicks');
+        dailyMood = null;
+        tempMood = null;
+    }
+    dailyMood = JSON.parse(localStorage.getItem('dailyMood'));
+
     let state = localStorage.getItem('treeState') || 'unplanted';
     let clicks = parseInt(localStorage.getItem('treeClicks')) || 0;
+
     const clicksNeeded = 80;
     let notificationTimeout;
     let growingNotificationShown = false;
-
-    const dailyMood = JSON.parse(localStorage.getItem('dailyMood'));
-    const todayKey = new Date().toISOString().split('T')[0];
 
     const isSimulatorActive = dailyMood && dailyMood.status === 'created' && dailyMood.date === todayKey && state !== 'shoveled';
 
@@ -422,7 +432,7 @@ function setupSimulatorPage() {
     
     const moodColor = dailyMood.moodColor;
     const moodName = dailyMood.moodName;
-    const treeType = getTreeType(dailyMood.valence, dailyDailymood.arousal);
+    const treeType = getTreeType(dailyMood.valence, dailyMood.arousal);
     treeContainer.style.setProperty('--leaf-color', moodColor);
 
     const quotes = {
@@ -470,12 +480,16 @@ function setupSimulatorPage() {
             mound.style.width = '100px';
             mound.style.height = '50px';
         } else if (state === 'fertilized' || state === 'growing' || state === 'mature') {
-            if (clicks < 20) {
+            if (clicks < 40) {
                 mound.style.display = 'block';
-                mound.style.backgroundColor = '#DAA520';
-                mound.style.width = '120px';
-                mound.style.height = '60px';
+                treeContainer.style.display = 'none';
+                if (clicks >= 20) {
+                    mound.style.backgroundColor = dailyMood.moodColor;
+                } else {
+                    mound.style.backgroundColor = '#DAA520';
+                }
             } else {
+                mound.style.display = 'none';
                 treeContainer.style.display = 'block';
                 drawTree(clicks, treeType);
             }
@@ -556,13 +570,17 @@ function setupSimulatorPage() {
 
     shovelBtn.addEventListener('click', () => {
         if (state === 'mature') {
-            const todayKey = new Date().toISOString().split('T')[0];
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const todayKey = `${year}-${month}-${day}`;
+
             const history = JSON.parse(localStorage.getItem('moodHistory')) || {};
             
-            // Get a random quote based on the tree type
             const randomQuote = quotes[treeType][Math.floor(Math.random() * quotes[treeType].length)];
 
-            history[todayKey] = { moodName, moodColor, treeType, note: dailyMood.note, quote: randomQuote }; // Save the note and the quote
+            history[todayKey] = { moodName, moodColor, treeType, note: dailyMood.note, quote: randomQuote };
             localStorage.setItem('moodHistory', JSON.stringify(history));
             
             localStorage.removeItem('tempMood');
@@ -570,34 +588,234 @@ function setupSimulatorPage() {
             localStorage.setItem('treeState', 'shoveled');
             state = 'shoveled';
 
-            window.location.href = `user-calendar.html?showDialog=true&date=${todayKey}`;
+            showShovelConfirmationDialog(dailyMood, treeType, randomQuote);
         }
     });
 
     updateUI();
 }
 
-function drawTree(clicks, treeType) {
-    const tree = document.getElementById('tree-container');
-    tree.className = ''; 
+function drawTree(clicks, treeType, targetElement = null) {
+    const tree = targetElement || document.getElementById('tree-container');
+    let trunk = tree.querySelector('.trunk');
+    let svgLeaves = tree.querySelector('svg.leaves-svg');
 
-    if (clicks >= 20 && clicks < 40) {
-        tree.classList.add('stage-1');
-    } else if (clicks >= 40 && clicks < 60) {
-        tree.classList.add('stage-2');
-    } else if (clicks >= 60 && clicks < 80) {
-        tree.classList.add('stage-3');
-    } else if (clicks >= 80) {
-        tree.classList.add('stage-4', `type-${treeType}`);
+    if (!trunk) {
+        trunk = document.createElement('div');
+        trunk.className = 'trunk';
+        tree.appendChild(trunk);
     }
+
+    let trunkHeight = 200;
+
+    trunk.style.height = `${trunkHeight}px`;
+
+    if (svgLeaves) {
+        svgLeaves.remove();
+    }
+
+    svgLeaves = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svgLeaves.setAttribute('class', 'leaves-svg');
+    svgLeaves.setAttribute('viewBox', '0 0 200 250'); 
+    svgLeaves.style.position = 'absolute';
+    svgLeaves.style.zIndex = '2';
+    svgLeaves.style.transition = 'all 0.5s ease-in-out';
+
+    tree.appendChild(svgLeaves);
+    
+    let pathData = '';
+    let svgWidth = 0;
+    let svgHeight = 0;
+    let svgBottom = 0;
+    let svgLeftOffset = 0;
+
+    if (clicks >= 40 && clicks < 60) {
+        svgWidth = 80;
+        svgHeight = 80;
+        svgBottom = trunkHeight - 40 - 10;
+        svgLeftOffset = -10;
+        svgLeaves.setAttribute('viewBox', '0 0 200 200');
+
+        const stage2Trunk = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        stage2Trunk.setAttribute('x', '95');
+        stage2Trunk.setAttribute('y', '150');
+        stage2Trunk.setAttribute('width', '10');
+        stage2Trunk.setAttribute('height', '50');
+        stage2Trunk.setAttribute('fill', '#80461B');
+        svgLeaves.appendChild(stage2Trunk);
+
+        const leaf1 = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+        leaf1.setAttribute('cx', '75');
+        leaf1.setAttribute('cy', '160');
+        leaf1.setAttribute('rx', '30');
+        leaf1.setAttribute('ry', '15');
+        leaf1.setAttribute('transform', 'rotate(-30 75 160)');
+        leaf1.setAttribute('fill', tree.style.getPropertyValue('--leaf-color'));
+        svgLeaves.appendChild(leaf1);
+
+        const leaf2 = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+        leaf2.setAttribute('cx', '125');
+        leaf2.setAttribute('cy', '160');
+        leaf2.setAttribute('rx', '30');
+        leaf2.setAttribute('ry', '15');
+        leaf2.setAttribute('transform', 'rotate(30 125 160)');
+        leaf2.setAttribute('fill', tree.style.getPropertyValue('--leaf-color'));
+        svgLeaves.appendChild(leaf2);
+
+    } else if (clicks >= 60 && clicks < 80) {
+        pathData = 'M100,20 C150,20 180,80 180,100 C180,120 150,180 100,180 C50,180 20,120 20,100 C20,80 50,20 100,20 Z';
+        svgWidth = 300;
+        svgHeight = 250;
+        svgBottom = trunkHeight - 120 + 70 - 10;
+        svgLeftOffset = -15;
+        svgLeaves.setAttribute('viewBox', '0 0 200 200');
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', pathData);
+        path.setAttribute('fill', tree.style.getPropertyValue('--leaf-color'));
+        svgLeaves.appendChild(path);
+    } else if (clicks >= 80) {
+        svgBottom = trunkHeight - 160 + 100;
+        svgLeftOffset = 30;
+
+        if (treeType === 'columnar') {
+            pathData = `
+                M100,0 
+                C180,50 180,200 100,250 
+                C20,200 20,50 100,0 
+                Z
+            `;
+            svgWidth = 200;
+            svgHeight = 250;
+            svgLeaves.setAttribute('viewBox', '0 0 200 250');
+            svgLeftOffset = 0;
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', pathData);
+            path.setAttribute('fill', tree.style.getPropertyValue('--leaf-color'));
+            svgLeaves.appendChild(path);
+        } else if (treeType === 'pine') {
+            pathData = `
+                M100,0 
+                L0,200 
+                L200,200 
+                Z
+            `;
+            svgWidth = 200; 
+            svgHeight = 200; 
+            svgBottom = trunkHeight - 160 + 100;
+            svgLeftOffset = 0;
+            svgLeaves.setAttribute('viewBox', '0 0 200 200');
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', pathData);
+            path.setAttribute('fill', tree.style.getPropertyValue('--leaf-color'));
+            svgLeaves.appendChild(path);
+
+            const tier1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            tier1.setAttribute('d', 'M100,20 L0,100 L200,100 Z');
+            tier1.setAttribute('fill', darkenColor(tree.style.getPropertyValue('--leaf-color'), 10));
+            svgLeaves.appendChild(tier1);
+
+            const tier2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            tier2.setAttribute('d', 'M100,80 L0,180 L200,180 Z');
+            tier2.setAttribute('fill', darkenColor(tree.style.getPropertyValue('--leaf-color'), 20));
+            svgLeaves.appendChild(tier2);
+
+            const tier3 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            tier3.setAttribute('d', 'M100,140 L0,240 L200,240 Z');
+            tier3.setAttribute('fill', darkenColor(tree.style.getPropertyValue('--leaf-color'), 30));
+            svgLeaves.appendChild(tier3);
+
+
+        } else if (treeType === 'weeping') {
+            const mainCanopy = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+            mainCanopy.setAttribute('cx', '100');
+            mainCanopy.setAttribute('cy', '100');
+            mainCanopy.setAttribute('rx', '100');
+            mainCanopy.setAttribute('ry', '75');
+            mainCanopy.setAttribute('fill', tree.style.getPropertyValue('--leaf-color'));
+            svgLeaves.appendChild(mainCanopy);
+
+            const hangingOval1 = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+            hangingOval1.setAttribute('cx', '60');
+            hangingOval1.setAttribute('cy', '190');
+            hangingOval1.setAttribute('rx', '25');
+            hangingOval1.setAttribute('ry', '60');
+            hangingOval1.setAttribute('fill', darkenColor(tree.style.getPropertyValue('--leaf-color'), 20));
+            svgLeaves.appendChild(hangingOval1);
+
+            const hangingOval2 = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+            hangingOval2.setAttribute('cx', '140');
+            hangingOval2.setAttribute('cy', '190');
+            hangingOval2.setAttribute('rx', '25');
+            hangingOval2.setAttribute('ry', '60');
+            hangingOval2.setAttribute('fill', darkenColor(tree.style.getPropertyValue('--leaf-color'), 20));
+            svgLeaves.appendChild(hangingOval2);
+
+            svgWidth = 200;
+            svgHeight = 250;
+            svgLeaves.setAttribute('viewBox', '0 0 200 250');
+            svgBottom = trunkHeight - 160 + 100;
+            svgLeftOffset = 0;
+        } else if (treeType === 'rounded') {
+            pathData = 'M20,100 A30,30 0 1,1 50,70 A40,40 0 1,1 100,70 A30,30 0 1,1 130,100 A30,30 0 1,1 100,130 A40,40 0 1,1 50,130 A30,30 0 1,1 20,100 Z';
+            svgWidth = 400;
+            svgHeight = 250;
+            svgLeaves.setAttribute('viewBox', '0 0 200 200');
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', pathData);
+            path.setAttribute('fill', tree.style.getPropertyValue('--leaf-color'));
+            svgLeaves.appendChild(path);
+        }
+    }
+
+    svgLeaves.style.width = `${svgWidth}px`;
+    svgLeaves.style.height = `${svgHeight}px`;
+    svgLeaves.style.bottom = `${svgBottom}px`;
+    svgLeaves.style.left = `calc(50% - ${svgWidth / 2}px + ${svgLeftOffset}px)`;
 }
 
 function getTreeType(valence, arousal) {
-    if (valence >= 0 && arousal >= 0) return 'pine';
-    if (valence < 0 && arousal >= 0) return 'columnar';
+    if (valence >= 0 && arousal >= 0) return 'columnar';
+    if (valence < 0 && arousal >= 0) return 'pine';
     if (valence < 0 && arousal < 0) return 'weeping';
     if (valence >= 0 && arousal < 0) return 'rounded';
     return 'rounded';
+}
+
+function showShovelConfirmationDialog(dailyMood, treeType, quote) {
+    const dialogOverlay = document.createElement('div');
+    dialogOverlay.className = 'mood-dialog-overlay';
+    dialogOverlay.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6); z-index: 1000;
+        display: flex; align-items: center; justify-content: center;
+    `;
+
+    const dialogBox = document.createElement('div');
+    dialogBox.style.cssText = `
+        background: #fff; padding: 30px; border-radius: 12px; text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3); max-width: 450px;
+        animation: pop 0.4s ease-out forwards;
+        display: flex; flex-direction: column; align-items: center;
+    `;
+
+    dialogBox.innerHTML = `
+        <h3 style="font-family: 'REM', sans-serif; margin-bottom: 15px; color: #333;">Congrats! You just planted a Mood Tree! Here's a quote for motivational prize:</h3>
+        <p style="font-style: italic; color: #666; margin-bottom: 25px; line-height: 1.5;">"${quote || 'No quote available.'}"</p>
+        <button id="view-calendar-button" style="padding: 12px 25px; background-color: #81C784; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; transition: background-color 0.2s;">View Calendar</button>
+    `;
+
+    document.body.appendChild(dialogOverlay);
+    dialogOverlay.appendChild(dialogBox);
+
+    document.getElementById('view-calendar-button').addEventListener('click', () => {
+        document.body.removeChild(dialogOverlay);
+        window.location.href = `user-calendar.html?showDialog=true&date=${dailyMood.date}`;
+    });
+
+    const styleSheet = document.createElement("style");
+    styleSheet.type = "text/css";
+    styleSheet.innerText = `@keyframes pop { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }`;
+    document.head.appendChild(styleSheet);
 }
 
 
@@ -643,8 +861,6 @@ function setupCalendarPage() {
         if (!entry) return;
 
         const { moodColor, treeType, quote } = entry; 
-
-        const randomQuote = quote || quotes[treeType][Math.floor(Math.random() * quotes[treeType].length)]; 
 
         const shovelOverlay = document.createElement('div');
         shovelOverlay.style.cssText = `
@@ -695,7 +911,7 @@ function setupCalendarPage() {
         box.innerHTML = `
             <h3>Your tree has been planted in the calendar!</h3>
             <div id="dialog-tree-container" style="width: 100%; height: 150px; display: flex; justify-content: center; align-items: flex-end; position: relative;"></div>
-            <p class="quote" style="font-style: italic; color: #666; max-width: 90%; margin: 15px auto; text-align: center;">"${randomQuote}"</p>
+            <p class="quote" style="font-style: italic; color: #666; max-width: 90%; margin: 15px auto; text-align: center;">"${entry.quote}"</p>
             <button id="confirm-shovel" style="padding: 12px 25px; background-color: #81C784; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; transition: background-color 0.2s;">Great!</button>
         `;
         box.querySelector('#confirm-shovel').onmouseover = function() { this.style.backgroundColor = '#66BB6A'; };
@@ -759,15 +975,13 @@ function setupCalendarPage() {
         } else if (treeType === 'columnar') {
             leaves.style.borderRadius = '10px / 40px';
             leaves.style.width = '40px'; leaves.style.height = '90px';
+        } else if (treeType === 'weeping') {
+            leaves.style.borderRadius = '50% 50% 40% 40%';
+            leaves.style.width = '90px'; leaves.style.height = '60px';
         } else {
             leaves.style.borderRadius = '50%';
             leaves.style.width = '80px'; leaves.style.height = '80px';
         }
-        if (treeType === 'weeping') {
-            leaves.style.borderRadius = '50% 50% 40% 40%';
-            leaves.style.width = '90px'; leaves.style.height = '60px';
-        }
-
 
         treeDiv.appendChild(trunk);
         treeDiv.appendChild(leaves);
@@ -891,7 +1105,7 @@ function darkenColor(color, percent) {
     let {r, g, b} = hexToRgb(color);
     r = Math.floor(r * (1 - percent / 100));
     g = Math.floor(g * (1 - percent / 100));
-    b = Math.floor(b * (1 - percent / 100));
+    b = Math.floor(b + (255 - b) * (percent / 100));
     return `rgb(${r},${g},${b})`;
 }
 
