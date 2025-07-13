@@ -17,3 +17,6 @@ July 4, 2025
 - Log Mood, based off how the user feel (color and measurement based on Russel's Circumplex Model.)
 - Additional notes in Log Mood
 
+July 13, 2025
+- Added new designs on tree-simulator
+- Is responsive for mobile and tablet sizes
