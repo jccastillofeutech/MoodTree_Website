@@ -386,15 +386,12 @@ function setupSimulatorPage() {
     const todayKey = `${year}-${month}-${day}`;
 
     let dailyMood = JSON.parse(localStorage.getItem('dailyMood'));
-    let tempMood = JSON.parse(localStorage.getItem('tempMood'));
 
-    if ((dailyMood && dailyMood.date !== todayKey) || (tempMood && tempMood.date !== todayKey)) {
+    if (dailyMood && dailyMood.date !== todayKey) {
         localStorage.removeItem('dailyMood');
-        localStorage.removeItem('tempMood');
         localStorage.removeItem('treeState');
         localStorage.removeItem('treeClicks');
         dailyMood = null;
-        tempMood = null;
     }
     dailyMood = JSON.parse(localStorage.getItem('dailyMood'));
 
@@ -404,8 +401,8 @@ function setupSimulatorPage() {
     const clicksNeeded = 80;
     let notificationTimeout;
     let growingNotificationShown = false;
-
-    const isSimulatorActive = dailyMood && dailyMood.status === 'created' && dailyMood.date === todayKey && state !== 'shoveled';
+    
+    const isSimulatorActive = dailyMood && dailyMood.status === 'created' && state !== 'shoveled';
 
     if (!isSimulatorActive) {
         plantBtn.disabled = true;
@@ -433,7 +430,8 @@ function setupSimulatorPage() {
     const moodColor = dailyMood.moodColor;
     const moodName = dailyMood.moodName;
     const treeType = getTreeType(dailyMood.valence, dailyMood.arousal);
-    treeContainer.style.setProperty('--leaf-color', moodColor);
+    
+    document.documentElement.style.setProperty('--leaf-color', moodColor);
 
     const quotes = {
         pine: [
@@ -458,6 +456,16 @@ function setupSimulatorPage() {
         ]
     };
 
+    function updateTreeAppearance(currentClicks, type) {
+        treeContainer.className = '';
+        if (currentClicks >= clicksNeeded) {
+            treeContainer.classList.add('stage-mature', `type-${type}`);
+        } else if (currentClicks >= 60) {
+            treeContainer.classList.add('stage-sapling');
+        } else if (currentClicks >= 40) {
+            treeContainer.classList.add('stage-seedling');
+        }
+    }
 
     function updateUI() {
         plantBtn.disabled = state !== 'unplanted';
@@ -467,31 +475,26 @@ function setupSimulatorPage() {
 
         mound.style.display = 'none';
         treeContainer.style.display = 'none';
+        mound.className = '';
 
         if (state === 'unplanted') {
         } else if (state === 'planted') {
             mound.style.display = 'block';
-            mound.style.backgroundColor = '#A0522D';
-            mound.style.width = '80px';
-            mound.style.height = '40px';
+            mound.classList.add('planted');
         } else if (state === 'watered') {
             mound.style.display = 'block';
-            mound.style.backgroundColor = '#8B4513';
-            mound.style.width = '100px';
-            mound.style.height = '50px';
+            mound.classList.add('watered');
         } else if (state === 'fertilized' || state === 'growing' || state === 'mature') {
             if (clicks < 40) {
                 mound.style.display = 'block';
-                treeContainer.style.display = 'none';
                 if (clicks >= 20) {
-                    mound.style.backgroundColor = dailyMood.moodColor;
+                    mound.classList.add('seed');
                 } else {
-                    mound.style.backgroundColor = '#DAA520';
+                    mound.classList.add('watered'); 
                 }
             } else {
-                mound.style.display = 'none';
                 treeContainer.style.display = 'block';
-                drawTree(clicks, treeType);
+                updateTreeAppearance(clicks, treeType);
             }
         } 
         
@@ -500,15 +503,9 @@ function setupSimulatorPage() {
         let shouldShow = true;
 
         switch(state) {
-            case 'unplanted':
-                notificationText = "Click the 'Plant' button to begin.";
-                break;
-            case 'planted':
-                notificationText = "Click the 'Water' button to water your seed.";
-                break;
-            case 'watered':
-                notificationText = "Click 'Fertilize' to enrich the soil.";
-                break;
+            case 'unplanted': notificationText = "Click the 'Plant' button to begin."; break;
+            case 'planted': notificationText = "Click the 'Water' button to water your seed."; break;
+            case 'watered': notificationText = "Click 'Fertilize' to enrich the soil."; break;
             case 'fertilized':
             case 'growing':
                 if (!growingNotificationShown) {
@@ -518,23 +515,18 @@ function setupSimulatorPage() {
                     shouldShow = false;
                 }
                 break;
-            case 'mature':
-                notificationText = "Your tree is fully grown! Click 'Shovel' to save your tree.";
-                break;
+            case 'mature': notificationText = "Your tree is fully grown! Click 'Shovel' to save your tree."; break;
         }
 
         if (shouldShow && notificationText) {
             progressNotification.textContent = notificationText;
             progressNotification.style.opacity = '1';
-            if (state === 'fertilized' || state === 'growing') {
-                notificationTimeout = setTimeout(() => {
-                    progressNotification.style.opacity = '0';
-                }, 2500);
-            }
+            notificationTimeout = setTimeout(() => {
+                progressNotification.style.opacity = '0';
+            }, 3000);
         } else if (!shouldShow) {
              progressNotification.style.opacity = '0';
         }
-
 
         const progress = Math.min((clicks / clicksNeeded) * 100, 100);
         progressBar.style.width = `${progress}%`;
@@ -543,30 +535,22 @@ function setupSimulatorPage() {
         localStorage.setItem('treeClicks', clicks);
     }
 
+    function handleGrowthClick() {
+        if (state === 'fertilized' || state === 'growing') {
+            if(state === 'fertilized') state = 'growing';
+            clicks++;
+            if (clicks >= clicksNeeded) {
+                state = 'mature';
+            }
+            updateUI();
+        }
+    }
+
     plantBtn.addEventListener('click', () => { state = 'planted'; updateUI(); });
     waterBtn.addEventListener('click', () => { state = 'watered'; updateUI(); });
     fertilizeBtn.addEventListener('click', () => { state = 'fertilized'; updateUI(); });
-    
-    mound.addEventListener('click', () => {
-        if (state === 'fertilized' || state === 'growing') {
-            state = 'growing';
-            clicks++;
-            if (clicks >= clicksNeeded) {
-                state = 'mature';
-            }
-            updateUI();
-        }
-    });
-
-    treeContainer.addEventListener('click', () => {
-        if (state === 'growing') {
-            clicks++;
-            if (clicks >= clicksNeeded) {
-                state = 'mature';
-            }
-            updateUI();
-        }
-    });
+    mound.addEventListener('click', handleGrowthClick);
+    treeContainer.addEventListener('click', handleGrowthClick);
 
     shovelBtn.addEventListener('click', () => {
         if (state === 'mature') {
@@ -593,184 +577,6 @@ function setupSimulatorPage() {
     });
 
     updateUI();
-}
-
-function drawTree(clicks, treeType, targetElement = null) {
-    const tree = targetElement || document.getElementById('tree-container');
-    let trunk = tree.querySelector('.trunk');
-    let svgLeaves = tree.querySelector('svg.leaves-svg');
-
-    if (!trunk) {
-        trunk = document.createElement('div');
-        trunk.className = 'trunk';
-        tree.appendChild(trunk);
-    }
-
-    let trunkHeight = 200;
-
-    trunk.style.height = `${trunkHeight}px`;
-
-    if (svgLeaves) {
-        svgLeaves.remove();
-    }
-
-    svgLeaves = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svgLeaves.setAttribute('class', 'leaves-svg');
-    svgLeaves.setAttribute('viewBox', '0 0 200 250'); 
-    svgLeaves.style.position = 'absolute';
-    svgLeaves.style.zIndex = '2';
-    svgLeaves.style.transition = 'all 0.5s ease-in-out';
-
-    tree.appendChild(svgLeaves);
-    
-    let pathData = '';
-    let svgWidth = 0;
-    let svgHeight = 0;
-    let svgBottom = 0;
-    let svgLeftOffset = 0;
-
-    if (clicks >= 40 && clicks < 60) {
-        svgWidth = 80;
-        svgHeight = 80;
-        svgBottom = trunkHeight - 40 - 10;
-        svgLeftOffset = -10;
-        svgLeaves.setAttribute('viewBox', '0 0 200 200');
-
-        const stage2Trunk = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        stage2Trunk.setAttribute('x', '95');
-        stage2Trunk.setAttribute('y', '150');
-        stage2Trunk.setAttribute('width', '10');
-        stage2Trunk.setAttribute('height', '50');
-        stage2Trunk.setAttribute('fill', '#80461B');
-        svgLeaves.appendChild(stage2Trunk);
-
-        const leaf1 = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-        leaf1.setAttribute('cx', '75');
-        leaf1.setAttribute('cy', '160');
-        leaf1.setAttribute('rx', '30');
-        leaf1.setAttribute('ry', '15');
-        leaf1.setAttribute('transform', 'rotate(-30 75 160)');
-        leaf1.setAttribute('fill', tree.style.getPropertyValue('--leaf-color'));
-        svgLeaves.appendChild(leaf1);
-
-        const leaf2 = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-        leaf2.setAttribute('cx', '125');
-        leaf2.setAttribute('cy', '160');
-        leaf2.setAttribute('rx', '30');
-        leaf2.setAttribute('ry', '15');
-        leaf2.setAttribute('transform', 'rotate(30 125 160)');
-        leaf2.setAttribute('fill', tree.style.getPropertyValue('--leaf-color'));
-        svgLeaves.appendChild(leaf2);
-
-    } else if (clicks >= 60 && clicks < 80) {
-        pathData = 'M100,20 C150,20 180,80 180,100 C180,120 150,180 100,180 C50,180 20,120 20,100 C20,80 50,20 100,20 Z';
-        svgWidth = 300;
-        svgHeight = 250;
-        svgBottom = trunkHeight - 120 + 70 - 10;
-        svgLeftOffset = -15;
-        svgLeaves.setAttribute('viewBox', '0 0 200 200');
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', pathData);
-        path.setAttribute('fill', tree.style.getPropertyValue('--leaf-color'));
-        svgLeaves.appendChild(path);
-    } else if (clicks >= 80) {
-        svgBottom = trunkHeight - 160 + 100;
-        svgLeftOffset = 30;
-
-        if (treeType === 'columnar') {
-            pathData = `
-                M100,0 
-                C180,50 180,200 100,250 
-                C20,200 20,50 100,0 
-                Z
-            `;
-            svgWidth = 200;
-            svgHeight = 250;
-            svgLeaves.setAttribute('viewBox', '0 0 200 250');
-            svgLeftOffset = 0;
-            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            path.setAttribute('d', pathData);
-            path.setAttribute('fill', tree.style.getPropertyValue('--leaf-color'));
-            svgLeaves.appendChild(path);
-        } else if (treeType === 'pine') {
-            pathData = `
-                M100,0 
-                L0,200 
-                L200,200 
-                Z
-            `;
-            svgWidth = 200; 
-            svgHeight = 200; 
-            svgBottom = trunkHeight - 160 + 100;
-            svgLeftOffset = 0;
-            svgLeaves.setAttribute('viewBox', '0 0 200 200');
-            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            path.setAttribute('d', pathData);
-            path.setAttribute('fill', tree.style.getPropertyValue('--leaf-color'));
-            svgLeaves.appendChild(path);
-
-            const tier1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            tier1.setAttribute('d', 'M100,20 L0,100 L200,100 Z');
-            tier1.setAttribute('fill', darkenColor(tree.style.getPropertyValue('--leaf-color'), 10));
-            svgLeaves.appendChild(tier1);
-
-            const tier2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            tier2.setAttribute('d', 'M100,80 L0,180 L200,180 Z');
-            tier2.setAttribute('fill', darkenColor(tree.style.getPropertyValue('--leaf-color'), 20));
-            svgLeaves.appendChild(tier2);
-
-            const tier3 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            tier3.setAttribute('d', 'M100,140 L0,240 L200,240 Z');
-            tier3.setAttribute('fill', darkenColor(tree.style.getPropertyValue('--leaf-color'), 30));
-            svgLeaves.appendChild(tier3);
-
-
-        } else if (treeType === 'weeping') {
-            const mainCanopy = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-            mainCanopy.setAttribute('cx', '100');
-            mainCanopy.setAttribute('cy', '100');
-            mainCanopy.setAttribute('rx', '100');
-            mainCanopy.setAttribute('ry', '75');
-            mainCanopy.setAttribute('fill', tree.style.getPropertyValue('--leaf-color'));
-            svgLeaves.appendChild(mainCanopy);
-
-            const hangingOval1 = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-            hangingOval1.setAttribute('cx', '60');
-            hangingOval1.setAttribute('cy', '190');
-            hangingOval1.setAttribute('rx', '25');
-            hangingOval1.setAttribute('ry', '60');
-            hangingOval1.setAttribute('fill', darkenColor(tree.style.getPropertyValue('--leaf-color'), 20));
-            svgLeaves.appendChild(hangingOval1);
-
-            const hangingOval2 = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-            hangingOval2.setAttribute('cx', '140');
-            hangingOval2.setAttribute('cy', '190');
-            hangingOval2.setAttribute('rx', '25');
-            hangingOval2.setAttribute('ry', '60');
-            hangingOval2.setAttribute('fill', darkenColor(tree.style.getPropertyValue('--leaf-color'), 20));
-            svgLeaves.appendChild(hangingOval2);
-
-            svgWidth = 200;
-            svgHeight = 250;
-            svgLeaves.setAttribute('viewBox', '0 0 200 250');
-            svgBottom = trunkHeight - 160 + 100;
-            svgLeftOffset = 0;
-        } else if (treeType === 'rounded') {
-            pathData = 'M20,100 A30,30 0 1,1 50,70 A40,40 0 1,1 100,70 A30,30 0 1,1 130,100 A30,30 0 1,1 100,130 A40,40 0 1,1 50,130 A30,30 0 1,1 20,100 Z';
-            svgWidth = 400;
-            svgHeight = 250;
-            svgLeaves.setAttribute('viewBox', '0 0 200 200');
-            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            path.setAttribute('d', pathData);
-            path.setAttribute('fill', tree.style.getPropertyValue('--leaf-color'));
-            svgLeaves.appendChild(path);
-        }
-    }
-
-    svgLeaves.style.width = `${svgWidth}px`;
-    svgLeaves.style.height = `${svgHeight}px`;
-    svgLeaves.style.bottom = `${svgBottom}px`;
-    svgLeaves.style.left = `calc(50% - ${svgWidth / 2}px + ${svgLeftOffset}px)`;
 }
 
 function getTreeType(valence, arousal) {

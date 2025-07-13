@@ -313,7 +313,10 @@
 
     <main class="main-content">
         <header class="header">
-            <h1>CALENDAR</h1>
+            <div class="header-info">
+                <h1>CALENDAR</h1>
+                <div class="date"></div>
+            </div>
             <input type="checkbox" id="menu-toggle" class="menu-toggle">
             <label for="menu-toggle" class="hamburger-icon">
                 <i class="fas fa-bars"></i>
@@ -322,9 +325,16 @@
                 <a href="user-dashboard.html">DASHBOARD</a>
                 <a href="log-mood.html">LOG MOODS</a>
                 <a href="tree-simulator.html">SIMULATOR</a>
-                <a href="user-calendar.html">CALENDAR</a>
+                <a href="user-calendar.html" class="active">CALENDAR</a>
                 <a href="resources-info.html">RESOURCES</a>
-                <a href="#" id="mobile-logout-button" class="logout-button">LOG OUT</a>
+                <a href="#" id="mobile-logout-button" class="logout-button-mobile">LOG OUT</a>
+                <div class="mobile-logo-container">
+                    <div class="mobile-logo"></div>
+                    <p id="mobile-username-display">Username</p>
+                </div>
+                <div class="mobile-footer">
+                    <p>&copy; 2025 MoodTree.<br>All Rights Reserved.</p>
+                </div>
             </nav>
         </header>
         <div class="calendar-container">
