@@ -170,7 +170,6 @@
                 <input type="password" id="password" name="password" required>
             </div>
             <button type="submit" class="btn btn-primary small-caps">CREATE ACCOUNT</button>
-            <button type="button" id="admin-signup-button" class="btn btn-secondary small-caps">SIGN UP FOR ADMIN</button>
         </form>
         <div class="form-footer">
             <p>Already have an account? <a href="login.html">Log In</a></p>
@@ -180,7 +179,6 @@
 
     <script>
         const signupForm = document.getElementById('signup-form');
-        const adminSignupButton = document.getElementById('admin-signup-button');
         const notification = document.getElementById('notification');
 
         signupForm.addEventListener('submit', function(event) {
@@ -218,64 +216,6 @@
             localStorage.setItem('loggedInUser', fullname);
 
             window.location.href = `../user-dashboard/user-dashboard.html?username=${encodeURIComponent(fullname)}`;
-        });
-
-        adminSignupButton.addEventListener('click', function() {
-            const fullname = document.getElementById('fullname').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            if (!fullname || !email || !password) {
-                notification.textContent = "Please fill in all fields.";
-                notification.className = 'notification error';
-                notification.style.display = 'block';
-                return;
-            }
-
-            let adminUsers = JSON.parse(localStorage.getItem('adminUsers')) || [];
-
-            const storedUserData = localStorage.getItem('userData');
-            if (storedUserData) {
-                const userData = JSON.parse(storedUserData);
-                if (userData.email === email) {
-                    notification.textContent = "An account with this email already exists as a regular user. Please log in with that account or use a different email for admin signup.";
-                    notification.className = 'notification error';
-                    notification.style.display = 'block';
-                    return;
-                }
-            }
-
-            if (adminUsers.some(admin => admin.email === email)) {
-                notification.textContent = "An admin account with this email already exists. Please log in or use a different email.";
-                notification.className = 'notification error';
-                notification.style.display = 'block';
-                return;
-            }
-
-            if (adminUsers.length >= 3) {
-                notification.textContent = "Admin user limit reached (3 users). Cannot create new admin account.";
-                notification.className = 'notification error';
-                notification.style.display = 'block';
-                return;
-            }
-
-            const newAdminUser = {
-                fullname: fullname,
-                email: email,
-                password: password,
-                isAdmin: true
-            };
-            adminUsers.push(newAdminUser);
-            localStorage.setItem('adminUsers', JSON.stringify(adminUsers));
-            localStorage.setItem('adminLoggedIn', fullname);
-
-            notification.textContent = "Admin account created successfully! Redirecting to admin dashboard.";
-            notification.className = 'notification';
-            notification.style.display = 'block';
-
-            setTimeout(() => {
-                window.location.href = '../admin-dashboard/admin-dashboard.html';
-            }, 2000);
         });
     </script>
 

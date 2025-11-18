@@ -163,7 +163,6 @@
                 <input type="password" id="password" name="password" required>
             </div>
             <button type="submit" class="btn btn-primary small-caps">LOG IN</button>
-            <button type="button" id="admin-login-button" class="btn btn-secondary small-caps">LOG IN FOR ADMIN</button>
         </form>
         <div class="form-footer">
             <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
@@ -173,7 +172,6 @@
 
     <script>
         const loginForm = document.getElementById('login-form');
-        const adminLoginButton = document.getElementById('admin-login-button');
         const notification = document.getElementById('notification');
 
         loginForm.addEventListener('submit', function(event) {
@@ -194,34 +192,9 @@
 
             if (email === userData.email && password === userData.password) {
                 localStorage.setItem('loggedInUser', userData.fullname);
-                localStorage.removeItem('adminLoggedIn');
                 window.location.href = `../user-dashboard/user-dashboard.html?username=${encodeURIComponent(userData.fullname)}`;
             } else {
                 notification.textContent = 'Invalid email or password for user account.';
-                notification.style.display = 'block';
-            }
-        });
-
-        adminLoginButton.addEventListener('click', function() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            let adminUsers = JSON.parse(localStorage.getItem('adminUsers')) || [];
-
-            const admin = adminUsers.find(admin => admin.email === email && admin.password === password);
-
-            if (admin) {
-                localStorage.setItem('adminLoggedIn', admin.fullname);
-                localStorage.removeItem('loggedInUser');
-                notification.textContent = "Admin login successful! Redirecting to admin dashboard.";
-                notification.className = 'notification';
-                notification.style.display = 'block';
-                setTimeout(() => {
-                    window.location.href = '../admin-dashboard/admin-dashboard.html';
-                }, 2000);
-            } else {
-                notification.textContent = 'Invalid email or password for admin account.';
-                notification.className = 'notification error';
                 notification.style.display = 'block';
             }
         });
