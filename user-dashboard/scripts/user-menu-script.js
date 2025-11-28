@@ -310,10 +310,12 @@ function loadDashboardData() {
     let dataToDisplay = JSON.parse(localStorage.getItem('dailyMood'));
 
     if (!dataToDisplay || dataToDisplay.date !== todayKey) {
+        if (dataToDisplay) localStorage.removeItem('dailyMood'); // Clean up old data
         const tempMood = JSON.parse(localStorage.getItem('tempMood'));
         if (tempMood && tempMood.date === todayKey) {
             dataToDisplay = tempMood;
         } else {
+            if (tempMood) localStorage.removeItem('tempMood'); // Clean up old data
             dataToDisplay = null;
         }
     }

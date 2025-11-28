@@ -207,6 +207,12 @@
                 }
             }
 
+            // Clear session-specific data for the new user
+            localStorage.removeItem('dailyMood');
+            localStorage.removeItem('tempMood');
+            localStorage.removeItem('treeState');
+            localStorage.removeItem('treeClicks');
+
             const newUserData = {
                 fullname: fullname,
                 email: email,

@@ -193,6 +193,12 @@
 
             if (email === userData.email && password === userData.password) {
                 localStorage.setItem('loggedInUser', userData.fullname);
+                // Clear previous session data to ensure a fresh start for the day
+                localStorage.removeItem('dailyMood');
+                localStorage.removeItem('tempMood');
+                localStorage.removeItem('treeState');
+                localStorage.removeItem('treeClicks');
+
                 window.location.href = `../user-dashboard/user-dashboard.html?username=${encodeURIComponent(userData.fullname)}`;
             } else {
                 notification.textContent = 'Invalid email or password for user account.';
