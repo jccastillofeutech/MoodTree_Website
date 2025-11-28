@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodTree - Sign-up</title>
+    <link rel="icon" href="../favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=REM:ital,wght@0,100..900;1,100..900&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
+
+        :root {
+            --jade-green: #00A86B;
+            --light-green-bg: #F0FFF4;
+            --dark-text: #2D3748;
+            --body-text: #4A5568;
+            --white: #ffffff;
+            --header-font: 'REM', sans-serif;
+            --body-font: 'Urbanist', sans-serif;
+            --border-color: #e2e8f0;
+        }
+        body {
+            margin: 0;
+            font-family: var(--body-font);
+            color: var(--body-text);
+            background-color: var(--light-green-bg);
+            font-size: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem 0;
+            background-image: url('../images/auth-pages-background/sign-up-background.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        h1 {
+            font-family: var(--header-font);
+            color: var(--dark-text);
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        a { color: var(--jade-green); text-decoration: none; font-weight: bold; }
+        a:hover { text-decoration: underline; }
+        .small-caps { font-variant: small-caps; }
+        .form-container {
+            background-color: var(--white);
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 420px;
+            box-sizing: border-box;
+            margin: 1rem;
+            position: relative;
+        }
+        .back-link {
+            position: absolute;
+            top: 2.5rem;
+            left: 2.5rem;
+            font-size: 1.25rem;
+            color: var(--body-text);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .back-link:hover {
+            color: var(--jade-green);
+        }
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: var(--dark-text);
+        }
+        .input-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--jade-green);
+        }
+        .btn {
+            display: inline-block;
+            font-weight: 700;
+            text-align: center;
+            vertical-align: middle;
+            user-select: none;
+            border: 1px solid transparent;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 9999px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            width: 100%;
+            font-family: var(--header-font);
+        }
+        .btn-primary {
+            background-color: var(--jade-green);
+            color: var(--white);
+            box-shadow: 0 4px 14px 0 rgba(0, 168, 107, 0.39);
+            margin-bottom: 1rem;
+        }
+        .btn-primary:hover { background-color: #008a58; }
+
+        .btn-secondary {
+            background-color: #A5D6A7;
+            color: var(--dark-text);
+            box-shadow: 0 4px 14px 0 rgba(165, 214, 167, 0.39);
+        }
+        .btn-secondary:hover { background-color: #81C784; }
+
+
+        .form-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        .form-footer p {
+            font-family: var(--body-font);
+        }
+        .notification {
+            display: none;
+            padding: 1rem 1.5rem;
+            background-color: #e6fffa;
+            border-left: 4px solid #38b2ac;
+            color: #234e52;
+            border-radius: 0.25rem;
+            margin-top: 1.5rem;
+            text-align: center;
+            font-family: var(--body-font);
+        }
+        .notification.error {
+            background-color: #fed7d7;
+            border-left-color: #f56565;
+            color: #c53030;
+        }
+        .logo-img {
+            display: block;
+            margin: 0 auto 1.5rem auto;
+            max-width: 150px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <a href="../index.html" class="back-link" aria-label="Go back to home page"><i class="fas fa-arrow-left"></i></a>
+        <img src="../images/logo.png" alt="MoodTree Logo" class="logo-img">
+        <h1>SIGN UP</h1>
+        <form id="signup-form">
+            <div class="input-group">
+                <label for="fullname">Full Name</label>
+                <input type="text" id="fullname" name="fullname" required>
+            </div>
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary small-caps">CREATE ACCOUNT</button>
+        </form>
+        <div class="form-footer">
+            <p>Already have an account? <a href="login.html">Log In</a></p>
+        </div>
+        <div id="notification" class="notification"></div>
+    </div>
+
+    <script>
+        const signupForm = document.getElementById('signup-form');
+        const notification = document.getElementById('notification');
+
+        signupForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const fullname = document.getElementById('fullname').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!fullname || !email || !password) {
+                notification.textContent = "Please fill in all fields.";
+                notification.className = 'notification error';
+                notification.style.display = 'block';
+                return;
+            }
+
+            const storedUserData = localStorage.getItem('userData');
+            if (storedUserData) {
+                const userData = JSON.parse(storedUserData);
+                if (userData.email === email) {
+                    notification.textContent = "An account with this email already exists. Please log in.";
+                    notification.className = 'notification error';
+                    notification.style.display = 'block';
+                    return;
+                }
+            }
+
+            const newUserData = {
+                fullname: fullname,
+                email: email,
+                password: password,
+                isAdmin: false
+            };
+            localStorage.setItem('userData', JSON.stringify(newUserData));
+            localStorage.setItem('loggedInUser', fullname);
+
+            window.location.href = `../user-dashboard/user-dashboard.html?username=${encodeURIComponent(fullname)}`;
+        });
+    </script>
+
+</body>
+</html>
